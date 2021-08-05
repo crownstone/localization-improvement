@@ -1,0 +1,18 @@
+{
+  "name": "localization-research",
+  "version": "0.0.0",
+  "description": "",
+  "main": "start.js",
+  "scripts": {
+    "start": "tsc --watch",
+    "build": "tsc"
+  },
+  "author": "Alex",
+  "dependencies": {
+    "typescript": "^4.3.5"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.7",
+    "@types/node": "^13.7.7"
+  }
+}

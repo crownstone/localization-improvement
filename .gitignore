@@ -1,0 +1,10 @@
+/tmp
+/src/js
+.idea
+
+.build
+.swiftpm
+.DS_Store
+datasets
+
+node_modules

@@ -1,0 +1,43 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "BluenetShared",
+        "repositoryURL": "https://github.com/crownstone/bluenet-ios-shared",
+        "state": {
+          "branch": null,
+          "revision": "ffed5e7530b3df62d365ce4f7b93b3147de6b9ca",
+          "version": "1.2.1"
+        }
+      },
+      {
+        "package": "KDTree",
+        "repositoryURL": "https://github.com/AlexDM0/KDTree.git",
+        "state": {
+          "branch": "master",
+          "revision": "c7779a97335b3f478cf91e6f8f9c59c07e358c4b",
+          "version": null
+        }
+      },
+      {
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser",
+        "state": {
+          "branch": null,
+          "revision": "83b23d940471b313427da226196661856f6ba3e0",
+          "version": "0.4.4"
+        }
+      },
+      {
+        "package": "SwiftyJSON",
+        "repositoryURL": "https://github.com/SwiftyJSON/SwiftyJSON",
+        "state": {
+          "branch": null,
+          "revision": "2b6054efa051565954e1d2b9da831680026cd768",
+          "version": "5.0.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
