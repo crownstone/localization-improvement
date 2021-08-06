@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import {TMP_OUTPUT_PATH_BASE, USER_PATH} from "../paths/paths";
+import {TMP_DATASET_PATH, TMP_OUTPUT_PATH_BASE, USER_PATH} from "../paths/paths";
 import {Dataset} from "./Dataset";
 import {Fingerprint} from "./Fingerprint";
 import {Runner} from "../runners/Runner";
@@ -8,7 +8,11 @@ import {Runner} from "../runners/Runner";
 export const FileUtil = {
 
   store: function(filePath : string, data: any) {
-    let str = typeof data === 'string' ? data : JSON.stringify(data)
+    let dirname = path.dirname(TMP_DATASET_PATH);
+    if (!fs.existsSync(dirname)) {
+      fs.mkdirSync(dirname)
+    }
+    let str = typeof data === 'string' ? data : JSON.stringify(data);
     fs.writeFileSync(filePath, str);
   },
 
