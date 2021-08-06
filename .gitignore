@@ -5,6 +5,5 @@
 .build
 .swiftpm
 .DS_Store
-datasets
 
 node_modules

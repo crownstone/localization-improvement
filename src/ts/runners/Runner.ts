@@ -1,21 +1,34 @@
 import {runIOS} from "./iOS";
-import {FileUtil} from "../util/FileUtil";
-import {DataMapper} from "../util/DataMappers";
-import {TMP_DATASET_PATH} from "../paths/paths";
+import {Dataset} from "../util/Dataset";
+import {FingerprintBase} from "../util/Fingerprint";
 
+export class Runner {
 
-export async function classifyDatasets(fingerprintPath : string, datasetPaths:string[]) : Promise<string[]> {
-  let outputPaths : string[] = [];
+  fingerprintRef  : FingerprintBase;
+  datasetRefArray : Dataset[] = [];
+  outputPathAnnotation = ''
 
-  for (let datasetPath of datasetPaths) {
-    const dataset           = FileUtil.readJSON<AppDatasetFormat>(datasetPath)
-    const formattedDataset  = DataMapper.AppDatasetToLibs(dataset);
-    FileUtil.store(TMP_DATASET_PATH, formattedDataset);
-
-    let outputPath = FileUtil.getOutputPath(datasetPath);
-    await runIOS(outputPath)
-    outputPaths.push(outputPath);
+  constructor(fingerprint: FingerprintBase, dataset: Dataset | Dataset[], outputPathAnnotation: string = '0') {
+    this.fingerprintRef = fingerprint;
+    if (Array.isArray(dataset)) {
+      this.datasetRefArray = dataset;
+    }
+    else {
+      this.datasetRefArray.push(dataset);
+    }
+    this.outputPathAnnotation = outputPathAnnotation;
   }
 
-  return outputPaths
+  async start() : Promise<string[]> {
+    let outputPaths = [];
+    this.fingerprintRef.writeToTempFile()
+    for (let dataset of this.datasetRefArray) {
+      dataset.writeToTempFile();
+      let outputPath = this.outputPathAnnotation + dataset.getOutputPath();
+      outputPaths.push(outputPath);
+      await runIOS(outputPath);
+    }
+    return outputPaths;
+  }
+
 }

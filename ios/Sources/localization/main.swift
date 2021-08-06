@@ -36,17 +36,22 @@ struct LocalizationSet: ParsableCommand {
 
         for fingerprint in fingerprintJSON {
             let json = fingerprint.1
-            naiveBayesianClassifier.loadTrainingData(json["locationId"].stringValue, referenceId: json["sphereId"].stringValue, trainingData: json["data"].stringValue)
+            naiveBayesianClassifier.loadTrainingData(
+                json["locationId"].stringValue,
+                referenceId: json["sphereId"].stringValue,
+                trainingData: json["data"].stringValue
+            )
         }
 
         for datapoint in datasetJSON {
             let data = datapoint.1
+         
             var inputVector = [iBeaconPacketProtocol]()
             for point in data["in"].arrayValue {
                 inputVector.append(iBeaconPacket(idString: point[0].stringValue, rssi: point[1].numberValue))
             }
 
-            let result = naiveBayesianClassifier.classify(inputVector, referenceId: data["sphereId"].stringValue)
+            let result = naiveBayesianClassifier.classifyRaw(inputVector, referenceId: data["sphereId"].stringValue)
             results.append(["NaiveBayesian": [
                                 "result": result as Any,
                                 "expectedLabel": data["label"].stringValue,

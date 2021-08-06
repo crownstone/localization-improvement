@@ -1,39 +1,42 @@
+interface SphereData {
+  name: string,
+  iBeaconUUID: string,
+  uid: number,
+  cloudId: string,
+  aiName: string,
+  latitude: number,
+  longitude: number,
+  updatedAt: string | Timestamp
+}
+
 // Fingerprints
-interface Datapoint {
+interface FingerprintDatapoint {
   devices: DevicesData,
   timestamp: Timestamp
 }
 interface AppFingerprintFormat {
   spheres: {
     [sphereId: string]: {  // sphereCloudId
-      [locationId: LocationId]: {
-        name: string,       // location name
-        cloudId: string,    // location cloudId
-        fingerprint: Datapoint[]
+      sphere: SphereData,
+      fingerprints: {
+        [locationId: LocationId]: {
+          name: string,       // location name
+          cloudId: string,    // location cloudId
+          fingerprint: FingerprintDatapoint[]
+        }
       }
     }
   }
 }
 
 // Datasets
-type AppDatapoint = [Timestamp, DeviceUUID, Rssi];
-type AppDatapointArray = AppDatapoint[];
 interface AppDatasetFormat {
   sphereCloudId: string,
-  sphere: {
-    name: string,
-    iBeaconUUID: string,
-    uid: number,
-    cloudId: string,
-    aiName: string,
-    latitude: number,
-    longitude: number,
-    updatedAt: string | Timestamp
-  },
+  sphere: SphereData,
   location: {
     name: string,
     uid: LocationId,
   }
-  dataset: AppDatapointArray[]
+  dataset: FingerprintDatapoint[]
 }
 

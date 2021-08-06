@@ -1,16 +1,10 @@
 // Fingerprints
-interface Datapoint {
-  devices: DevicesData,
-  timestamp: Timestamp
-}
-
 interface Fingerprint {
   sphereId:   string,
   locationId: LocationId,
-  data:       Datapoint[]
+  data:       FingerprintDatapoint[]
 }
 type FingerprintLibFileFormat = Fingerprint[]
-
 
 
 // Dataset
@@ -20,5 +14,5 @@ interface DatapointFile {
   label: LocationId,
   sphereId: string,
 }
-type DatasetFileLibFormat     = DatapointFile[]
+type DatasetFileLibFormat = DatapointFile[]
 
