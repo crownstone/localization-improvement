@@ -5,14 +5,17 @@
   "main": "start.js",
   "scripts": {
     "start": "tsc --watch",
-    "build": "tsc"
+    "build": "tsc",
+    "server": "node ./src/js/receiveFiles"
   },
   "author": "Alex",
   "dependencies": {
-    "typescript": "^4.3.5"
+    "peerjs-on-node": "^1.0.2",
+    "wrtc": "^0.4.7"
   },
   "devDependencies": {
     "@types/jest": "^26.0.7",
-    "@types/node": "^13.7.7"
+    "@types/node": "^13.7.7",
+    "typescript": "^4.3.5"
   }
 }

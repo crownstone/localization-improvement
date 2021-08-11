@@ -9,7 +9,7 @@ interface SphereData {
   updatedAt: string | Timestamp
 }
 
-// Fingerprints
+// FingerprintSet
 interface FingerprintDatapoint {
   devices: DevicesData,
   timestamp: Timestamp
@@ -38,5 +38,10 @@ interface AppDatasetFormat {
     uid: LocationId,
   }
   dataset: FingerprintDatapoint[]
+}
+
+// config
+interface ScenarioConfig {
+  activeScenario: string,
 }
 

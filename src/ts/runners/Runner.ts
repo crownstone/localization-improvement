@@ -1,14 +1,14 @@
 import {runIOS} from "./iOS";
-import {Dataset} from "../util/Dataset";
-import {FingerprintBase} from "../util/Fingerprint";
+import {FingerprintsBase} from "../dataContainers/Fingerprint";
+import {Dataset} from "../dataContainers/Dataset";
 
 export class Runner {
 
-  fingerprintRef  : FingerprintBase;
+  fingerprintRef  : FingerprintsBase;
   datasetRefArray : Dataset[] = [];
-  outputPathAnnotation = ''
+  outputPathAnnotation : string;
 
-  constructor(fingerprint: FingerprintBase, dataset: Dataset | Dataset[], outputPathAnnotation: string = '0') {
+  constructor(fingerprint: FingerprintsBase, dataset: Dataset | Dataset[], outputPathAnnotation?: string) {
     this.fingerprintRef = fingerprint;
     if (Array.isArray(dataset)) {
       this.datasetRefArray = dataset;
@@ -24,7 +24,7 @@ export class Runner {
     this.fingerprintRef.writeToTempFile()
     for (let dataset of this.datasetRefArray) {
       dataset.writeToTempFile();
-      let outputPath = this.outputPathAnnotation + dataset.getOutputPath();
+      let outputPath = dataset.getOutputPath(this.outputPathAnnotation);
       outputPaths.push(outputPath);
       await runIOS(outputPath);
     }

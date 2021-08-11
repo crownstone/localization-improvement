@@ -1,7 +1,7 @@
 import ArgumentParser
 import Foundation
 import SwiftyJSON
-import BluenetBasicLocalization
+import BluenetLocalization
 import BluenetShared
 
 struct iBeaconPacket: iBeaconPacketProtocol {
@@ -45,21 +45,24 @@ struct LocalizationSet: ParsableCommand {
 
         for datapoint in datasetJSON {
             let data = datapoint.1
-         
+            let sphereId = data["sphereId"].stringValue
+            
             var inputVector = [iBeaconPacketProtocol]()
             for point in data["in"].arrayValue {
                 inputVector.append(iBeaconPacket(idString: point[0].stringValue, rssi: point[1].numberValue))
             }
 
-            let result = naiveBayesianClassifier.classifyRaw(inputVector, referenceId: data["sphereId"].stringValue)
-            results.append(["NaiveBayesian": [
-                                "result": result as Any,
-                                "expectedLabel": data["label"].stringValue,
-                                "probabilities": naiveBayesianClassifier.getProbabilities(data["sphereId"].stringValue) as Any
-                            ]])
+            let result = naiveBayesianClassifier.classifyRaw(inputVector, referenceId: sphereId)
+            results.append([
+                            "result":        result as Any,
+                            "expectedLabel": data["label"].stringValue,
+                            "probabilities": naiveBayesianClassifier.getProbabilities(sphereId) as Any
+                        ])
         }
         
-        let jsonData = JSON(results)
+        
+        
+        let jsonData = JSON(["NaiveBayesian": results])
         let data = try jsonData.rawData()
         try! data.write(to: URL(fileURLWithPath: outputPath))
     }

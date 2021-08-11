@@ -8,12 +8,14 @@ export const DataMapper = {
     let result : FingerprintLibFileFormat = [];
     for (let sphereId in appFingerprintData.spheres) {
       let sphere = appFingerprintData.spheres[sphereId];
-      for (let locationId in sphere.fingerprints) {
-        result.push({
-          sphereId,
-          locationId,
-          data: sphere.fingerprints[locationId].fingerprint
-        })
+      for (let locationId in sphere) {
+        if (locationId !== 'sphere') {
+          result.push({
+            sphereId,
+            locationId,
+            data: sphere[locationId].fingerprint
+          })
+        }
       }
     }
     return result;
@@ -27,8 +29,8 @@ export const DataMapper = {
     let result : DatasetFileLibFormat = [];
     for (let fingerprintDatapoint of appDatasetData.dataset) {
       let input = [];
-      for (let uuid in fingerprintDatapoint) {
-        input.push([uuid, fingerprintDatapoint[uuid]])
+      for (let uuid in fingerprintDatapoint.devices) {
+        input.push([uuid, fingerprintDatapoint.devices[uuid]])
       }
       result.push({
         in: input,

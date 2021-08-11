@@ -1,9 +1,9 @@
 import {exec} from "child_process";
-import {TMP_DATASET_PATH, TMP_FINGERPRINT_PATH} from "../paths/paths";
+import {TMP_DATASET_PATH, TMP_FINGERPRINT_PATH} from "../config";
 
 const packagePath = `${__dirname}/../../../ios`
 
-export async function runIOS(outputPath) : Promise<void> {
+export async function runIOS(outputPath, silent=true) : Promise<void> {
   return new Promise((resolve, reject) => {
     const callback = function (error, stdout, stderr) {
       if (error) {
@@ -11,8 +11,10 @@ export async function runIOS(outputPath) : Promise<void> {
         console.log('Error code: '+error.code);
         console.log('Signal received: '+error.signal);
       }
-      console.log('Child Process STDERR: '+stderr);
-      console.log('Child Process STDOUT: '+stdout);
+      if (silent === false) {
+        console.log('Child Process STDERR: ' + stderr);
+        console.log('Child Process STDOUT: ' + stdout);
+      }
       resolve();
     };
 

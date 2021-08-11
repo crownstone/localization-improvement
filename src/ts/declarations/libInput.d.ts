@@ -1,4 +1,4 @@
-// Fingerprints
+// FingerprintSet
 interface Fingerprint {
   sphereId:   string,
   locationId: LocationId,

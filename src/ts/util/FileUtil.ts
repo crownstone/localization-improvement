@@ -1,36 +1,39 @@
 import fs from "fs";
 import path from "path";
-import {TMP_DATASET_PATH, TMP_OUTPUT_PATH_BASE, USER_PATH} from "../paths/paths";
-import {Dataset} from "./Dataset";
-import {Fingerprint} from "./Fingerprint";
-import {Runner} from "../runners/Runner";
+import {TMP_DATASET_PATH, TMP_OUTPUT_PATH_BASE, USER_PATH} from "../config";
+import {UserData} from "../dataContainers/User";
 
 export const FileUtil = {
 
-  store: function(filePath : string, data: any) {
+  store: function(filePath : string, data: any, options = {encoding:'utf8'}) {
     let dirname = path.dirname(TMP_DATASET_PATH);
     if (!fs.existsSync(dirname)) {
       fs.mkdirSync(dirname)
     }
     let str = typeof data === 'string' ? data : JSON.stringify(data);
-    fs.writeFileSync(filePath, str);
+    fs.writeFileSync(filePath, str, options);
   },
+
 
   readJSON: function<T>(filePath : string) : T {
     let data = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(data) as T
   },
 
-  getOutputPath: function(datasetPath: string) {
+  getOutputPath: function(datasetPath: string, annotation? : string) {
     let basename = path.basename(datasetPath);
+    if (annotation) {
+      return TMP_OUTPUT_PATH_BASE + "output_" + annotation + "_" + basename
+    }
     return TMP_OUTPUT_PATH_BASE + "output_" + basename
   },
 
-  getUsers: function() : UserData[] {
+  getUsers: function() : {[userName: string] : UserData } {
     let items = FileUtil.getDirectoryPaths(USER_PATH)
-    let result : UserData[] = [];
+    let result : {[userName: string] : UserData } = {}
     for (let item of items) {
-      result.push(new UserData(item))
+      let data = new UserData(item);
+      result[data.name] = data;
     }
     return result;
   },
@@ -67,57 +70,31 @@ export const FileUtil = {
       result.push(usedPath)
     }
     return result;
+  },
+
+  deleteFile: function(path) {
+    fs.unlinkSync(path);
+  },
+
+  renameFile: function(oldPath, newPath) {
+    fs.renameSync(oldPath, newPath);
+  },
+
+  ensurePath(pathToEnsure) {
+    if (fs.existsSync(pathToEnsure) && fs.statSync(pathToEnsure).isDirectory() === true) {
+      return true;
+    }
+    else {
+      fs.mkdirSync(pathToEnsure);
+    }
+  },
+
+  ensureDatapath(userName, scenarioName) {
+    let userPath = path.join(USER_PATH, userName);
+    let scenarioPath = path.join(userPath, scenarioName);
+    let fingerprintPath = path.join(scenarioPath, 'fingerprints');
+    FileUtil.ensurePath(userPath);
+    FileUtil.ensurePath(scenarioPath);
+    FileUtil.ensurePath(fingerprintPath);
   }
 }
-
-export class UserData {
-
-  name: string;
-  scenarios : ScenarioData[] = [];
-
-  constructor(userPath: string) {
-    this.name = path.basename(userPath);
-    let scenarioPaths = FileUtil.getDirectoryPaths(userPath);
-    for (let scenarioPath of scenarioPaths) {
-      this.scenarios.push(new ScenarioData(scenarioPath))
-    }
-  }
-}
-
-export class ScenarioData {
-
-  name         : string;
-  fingerprints : Fingerprint[] = [];
-  datasets     : Dataset[]     = [];
-  outputPaths  : string[]      = [];
-  constructor(scenarioPath: string) {
-    this.name = path.basename(scenarioPath);
-
-    let fingerprintFiles = FileUtil.getJSONFilePaths(path.join(scenarioPath, 'fingerprints'));
-    let datasetFiles = FileUtil.getJSONFilePaths(scenarioPath);
-
-    for (let fingerprintPath of fingerprintFiles) {
-      this.fingerprints.push(new Fingerprint(fingerprintPath));
-    }
-
-    for (let datasetPath of datasetFiles) {
-      this.datasets.push(new Dataset(datasetPath));
-    }
-
-    for (let dataset of this.datasets) {
-      this.outputPaths.push(dataset.getOutputPath())
-    }
-  }
-
-  async run() : Promise<string[]> {
-    let fingerprintIndex = 0;
-    let outputPaths = [];
-    for (let fingerprint of this.fingerprints) {
-      let runner = new Runner(fingerprint, this.datasets, `${fingerprintIndex++}_`);
-      let paths = await runner.start();
-      outputPaths = outputPaths.concat(paths)
-    }
-    return outputPaths
-  }
-}
-

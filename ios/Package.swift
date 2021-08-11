@@ -15,8 +15,8 @@ let package = Package(
             .exact("5.0.0")
         ),
         .package(
-            name: "BluenetBasicLocalization", 
-            path:"/Users/alex/Dropbox/Crownstone/Projects/XCode/CrownstoneLocalizationIOS/"
+            name: "BluenetLocalization",
+            path:"/Users/alex/Dropbox/Crownstone/Projects/XCode/bluenet-localization/"
         )
     ],
     targets: [
@@ -27,7 +27,7 @@ let package = Package(
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 "SwiftyJSON",
-                "BluenetBasicLocalization"
+                "BluenetLocalization"
             ])
     ]
 )
