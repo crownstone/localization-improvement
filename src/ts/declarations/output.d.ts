@@ -1,6 +1,10 @@
-interface NBClassificationResults {
+interface ClassificationResults {
+  sphereId: string,
   result: LocationId | null,
   expectedLabel: LocationId,
+}
+
+interface NBClassificationResults extends ClassificationResults {
   probabilities: {
     [locationId: LocationId]: {
       probability: number,
@@ -9,20 +13,18 @@ interface NBClassificationResults {
   }
 }
 
-interface KNNClassificationResults {
-  result: LocationId | null,
-  expectedLabel: LocationId,
+interface KNNClassificationResults extends ClassificationResults {
+  distanceMap: {
+    locationId: {
+      dataIndex: number // squared distance of this point to the vector
+    }
+  }
 }
 
-interface NearestCrownstoneClassificationResults {
-  result: LocationId | null,
-  expectedLabel: LocationId,
-}
 
 
 interface LibOutputDataset {
-  NaiveBayesian:     NBClassificationResults[],
-  KNN:               KNNClassificationResults[],
-  NearestCrownstone: NearestCrownstoneClassificationResults[],
+  naiveBayesian:     NBClassificationResults[],
+  kNN:               KNNClassificationResults[],
 }
 

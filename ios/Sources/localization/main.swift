@@ -30,9 +30,12 @@ struct LocalizationSet: ParsableCommand {
         let datasetData = try Data(contentsOf: URL(fileURLWithPath: datasetPath))
         let datasetJSON = try JSON(data: datasetData)
         
-        var results = [[String: Any]]()
+        var NaiveBayesianResults = [[String: Any]]()
+        var kNNResults = [[String: Any]]()
         
         let naiveBayesianClassifier = CrownstoneBasicClassifier()
+        let knnClassifier = Forest()
+        knnClassifier.setDebugging(debug: true)
 
         for fingerprint in fingerprintJSON {
             let json = fingerprint.1
@@ -41,8 +44,15 @@ struct LocalizationSet: ParsableCommand {
                 referenceId: json["sphereId"].stringValue,
                 trainingData: json["data"].stringValue
             )
+            knnClassifier.loadTrainingData(
+                json["locationId"].stringValue,
+                referenceId: json["sphereId"].stringValue,
+                trainingData: json["data"].stringValue
+            )
         }
 
+        knnClassifier.start()
+        
         for datapoint in datasetJSON {
             let data = datapoint.1
             let sphereId = data["sphereId"].stringValue
@@ -52,17 +62,26 @@ struct LocalizationSet: ParsableCommand {
                 inputVector.append(iBeaconPacket(idString: point[0].stringValue, rssi: point[1].numberValue))
             }
 
-            let result = naiveBayesianClassifier.classifyRaw(inputVector, referenceId: sphereId)
-            results.append([
-                            "result":        result as Any,
+            let NaiveBayesianResult = naiveBayesianClassifier.classifyRaw(inputVector, referenceId: sphereId)
+            let kNNResult = knnClassifier.classify(inputVector, referenceId: sphereId)
+            NaiveBayesianResults.append([
+                            "sphereId":      sphereId,
+                            "result":        NaiveBayesianResult as Any,
                             "expectedLabel": data["label"].stringValue,
                             "probabilities": naiveBayesianClassifier.getProbabilities(sphereId) as Any
+                        ])
+            
+            kNNResults.append([
+                            "sphereId":      sphereId,
+                            "result":        kNNResult as Any,
+                            "expectedLabel": data["label"].stringValue,
+                            "distanceMap":   knnClassifier.getDistanceMap(sphereId) as Any
                         ])
         }
         
         
         
-        let jsonData = JSON(["NaiveBayesian": results])
+        let jsonData = JSON(["naiveBayesian": NaiveBayesianResults, "kNN": kNNResults])
         let data = try jsonData.rawData()
         try! data.write(to: URL(fileURLWithPath: outputPath))
     }

@@ -80,6 +80,10 @@ export const FileUtil = {
     fs.renameSync(oldPath, newPath);
   },
 
+  fileExists: function(path) {
+    return fs.existsSync(path)
+  },
+
   ensurePath(pathToEnsure) {
     if (fs.existsSync(pathToEnsure) && fs.statSync(pathToEnsure).isDirectory() === true) {
       return true;

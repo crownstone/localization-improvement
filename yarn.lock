@@ -13,6 +13,11 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
+"@types/d3@^3":
+  version "3.5.45"
+  resolved "https://registry.yarnpkg.com/@types/d3/-/d3-3.5.45.tgz#cceb1cd8f468b0ed1c96546ddefff3408d7463a7"
+  integrity sha512-wLICfMtjDEoAJie1MF6OuksAzOapRXgJy+l5HQVpyC1yMAlvHz2QKrrasUHru8xD6cbgQNGeO+CeyjOlKtly2A==
+
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.3.tgz#4ba8ddb720221f432e443bd5f9117fd22cfd4762"
@@ -49,6 +54,13 @@
   version "13.13.52"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.52.tgz#03c13be70b9031baaed79481c0c0cfb0045e53f7"
   integrity sha512-s3nugnZumCC//n4moGGe6tkNMyYEdaDBitVjwPxXmR5lnMG5dHePinH2EdxkG3Rh1ghFHHixAG4NJhpJW1rthQ==
+
+"@types/plotly.js@^1.54.10":
+  version "1.54.14"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-1.54.14.tgz#738f3507f49a707c03aae4fd5d568571ddf8bf31"
+  integrity sha512-vYevenBloZ3B4i831i+ccS9u782JSnkJpBG/c/qPRJNDW6s25udnrmoHkFhbBl7jkzBy8pO2lPNhpMrQJV7ETA==
+  dependencies:
+    "@types/d3" "^3"
 
 "@types/yargs-parser@*":
   version "20.2.1"
@@ -389,6 +401,13 @@ node-pre-gyp@^0.13.0:
     rimraf "^2.6.1"
     semver "^5.3.0"
     tar "^4"
+
+nodeplotlib@^0.7.5:
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/nodeplotlib/-/nodeplotlib-0.7.5.tgz#6932e0c8abbb8da3f5cb65dbe548199599d8ed28"
+  integrity sha512-vCebCtxvzOkN8VnFFyeMShOZmVW/pNPHtl3WuqvvcXZylBLKoZXpmgDuL/M+OcAsBCgMJMA5pXfBHydnjwRrJw==
+  dependencies:
+    "@types/plotly.js" "^1.54.10"
 
 nopt@^4.0.1:
   version "4.0.3"

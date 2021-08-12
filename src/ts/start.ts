@@ -2,8 +2,10 @@
 
 import {FileUtil} from "./util/FileUtil";
 import {Runner} from "./runners/Runner";
-import {OutputData} from "./dataContainers/OutputData";
+import {DataAggregator, OutputData} from "./dataContainers/OutputData";
 
+
+let agg = new DataAggregator();
 
 async function run() {
   console.log("Scanning for users...")
@@ -17,17 +19,23 @@ async function run() {
       let counter = 1;
       for (let fingerprint of scenario.fingerprints) {
         console.log("---- Running fingerprint set #", counter++);
+        let locationNameMap = fingerprint.getLocationNameMap();
         for (let dataset of scenario.datasets) {
           console.log("------ Processing dataset", dataset.name);
           let runner = new Runner(fingerprint, dataset)
           let result = await runner.start();
-          let outputData = new OutputData(result[0])
-          outputData.process();
-          console.log(`-------- NaiveBayesian success rate ${(outputData.results.NaiveBayesian.rate*100).toFixed(2)}% out of ${outputData.results.NaiveBayesian.count} samples.`)
+          let outputData = new OutputData(result[0], locationNameMap)
+          agg.add(outputData);
+
+          // outputData.plot()
+          console.log(`-------- naiveBayesian success rate ${outputData.naiveBayesian.percentage} out of ${outputData.naiveBayesian.count} samples.`)
+          console.log(`-------- kNN           success rate ${outputData.kNN.percentage} out of ${outputData.kNN.count} samples.`)
+          // return;
         }
       }
     }
   }
+  agg.plot()
 }
 
 run()

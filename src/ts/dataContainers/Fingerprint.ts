@@ -13,44 +13,56 @@ export class FingerprintsBase {
   writeToTempFile(tmpFilePath = TMP_FINGERPRINT_PATH) {
     FileUtil.store(tmpFilePath, this.getLibData());
   }
+
+  getLocationNameMap() : LocationNameMap {
+    throw "OVERRIDE"
+  }
 }
 
 
-export class FingerprintsBuilder extends FingerprintsBase {
-
-  sphereId:     string;
-  locations:  { [locationId: string]: FingerprintDatapoint[] } = {};
-  constructor(sphereId: string) {
-    super();
-    this.sphereId = sphereId;
-  }
-
-  loadDatapointForLocation(locationId : string, datapoint: FingerprintDatapoint | FingerprintDatapoint[]) {
-    if (this.locations[locationId] === undefined) {
-      this.locations[locationId] = [];
-    }
-
-    if (Array.isArray(datapoint)) {
-      this.locations[locationId] = this.locations[locationId].concat(datapoint);
-    }
-    else {
-      this.locations[locationId].push(datapoint);
-    }
-  }
-
-  getLibData() : FingerprintLibFileFormat {
-    let result : FingerprintLibFileFormat = [];
-    for (let locationId in this.locations) {
-      result.push({
-        sphereId: this.sphereId,
-        locationId,
-        data: this.locations[locationId]
-      })
-    }
-    return result;
-  }
-
-}
+// export class FingerprintsBuilder extends FingerprintsBase {
+//
+//   sphereId:     string;
+//   locations:  { [locationId: string]: FingerprintDatapoint[] } = {};
+//   locationNameMap = {};
+//
+//   constructor(sphereId: string) {
+//     super();
+//     this.sphereId = sphereId;
+//     this.locationNameMap[this.sphereId] = {};
+//   }
+//
+//   getLocationNameMap() {
+//     return this.locationNameMap;
+//   }
+//
+//   loadDatapointForLocation(locationName: string, locationId : string, datapoint: FingerprintDatapoint | FingerprintDatapoint[]) {
+//     this.locationNameMap[this.sphereId][locationId] = locationName;
+//
+//     if (this.locations[locationId] === undefined) {
+//       this.locations[locationId] = [];
+//     }
+//
+//     if (Array.isArray(datapoint)) {
+//       this.locations[locationId] = this.locations[locationId].concat(datapoint);
+//     }
+//     else {
+//       this.locations[locationId].push(datapoint);
+//     }
+//   }
+//
+//   getLibData() : FingerprintLibFileFormat {
+//     let result : FingerprintLibFileFormat = [];
+//     for (let locationId in this.locations) {
+//       result.push({
+//         sphereId: this.sphereId,
+//         locationId,
+//         data: this.locations[locationId]
+//       })
+//     }
+//     return result;
+//   }
+// }
 
 export class FingerprintSet extends FingerprintsBase {
 
@@ -67,6 +79,19 @@ export class FingerprintSet extends FingerprintsBase {
     if (this.data) { return this.data; }
     this.data = FileUtil.readJSON<AppFingerprintFormat>(this.path);
     return this.data;
+  }
+
+  getLocationNameMap() : LocationNameMap {
+    this.getAppData();
+    let result = {};
+    for (let sphereId in this.data.spheres) {
+      result[sphereId] = {};
+      let locations = this.data.spheres[sphereId];
+      for (let locationId in locations) {
+        result[sphereId][locationId] = locations[locationId].name;
+      }
+    }
+    return result;
   }
 
   getLibData() : FingerprintLibFileFormat {
