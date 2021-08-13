@@ -22,10 +22,6 @@ This seggragation is done because a user has a number of spheres, and assuming t
 If you move your Crownstones around, the datasets cannot be compared directly. Each dataset belongs to a certain grouping and positioning of Crownstones or other
 major changes in the environment. If we mix the fingerprints across scenarios's this would lead to a lot of explainable and preventable misclassifications.
 
-### TestSets
-
-A TestSet is a combination of 1 fingerprint and X datasets. A scenario has multiple TestSet.
-
 ### Fingerprints
 
 Since each scenario can be trained multiple times, we can keep track of multiple fingerprints. 

@@ -5,10 +5,12 @@ import {TestSet} from "./TestSet";
 export class Scenario {
 
   name         : string;
+  path         : string;
   sets         : TestSet[] = []
 
   constructor(scenarioPath: string) {
     this.name = path.basename(scenarioPath);
+    this.path = scenarioPath;
 
     let fingerprintFiles = FileUtil.getJSONFilePaths(path.join(scenarioPath, 'fingerprints'));
 

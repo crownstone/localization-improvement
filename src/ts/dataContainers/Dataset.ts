@@ -42,29 +42,51 @@ export class Dataset {
     return samples[index];
   }
 
+  plotSummary(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
+    this.plotDistanceReport(  width, height);
+    this.plotSampleSizeGraph( width, 0.5*height);
+    this.plotOffsetGraph(     width, 0.5*height);
+    plot();
+  }
+
   plotOffsetGraph(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
     let data = this.getAppData();
 
-    let results = []
-    let labels = [];
-    for (let i = 0; i < data.dataset.length; i++) {
-      results.push(new Array(data.dataset.length))
-      labels.push(i)
-    }
-
+    let plotData = []
     let result = []
-
-    for (let i = 1; i < data.dataset.length; i++) {
-      let [squaredDistance, similarItems] = getDistance(data.dataset[i-1], data.dataset[i]);
+    let distance = Math.min(5, Math.ceil(data.dataset.length/2));
+    for (let j = distance; j < data.dataset.length; j++) {
+      let [squaredDistance, similarItems] = getDistance(data.dataset[j - distance], data.dataset[j]);
       result.push(squaredDistance)
     }
+    plotData.push({y:result, name:`D=${distance}`})
 
     let layout : Layout = {
-      title: "Squared distance between sequantial samples (movement estimate)",
+      title: "Squared distance between sequantial samples (movement estimate) (D=5)",
       width: width,
       height: height,
       xaxis:{title:"samples"},
       yaxis:{title:"squared distance"},
+      ...PLOT_MARGINS,
+    }
+
+    stack(plotData, layout);
+  }
+
+  plotSampleSizeGraph(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
+    let data = this.getAppData();
+
+    let result = []
+    for (let point of data.dataset) {
+      result.push(Object.keys(point.devices).length)
+    }
+
+    let layout : Layout = {
+      title: "Amount of devices per sample",
+      width: width,
+      height: height,
+      xaxis:{title:"samples"},
+      yaxis:{title:"devicecount"},
       ...PLOT_MARGINS,
     }
 
@@ -76,16 +98,23 @@ export class Dataset {
 
     let results = []
     let labels = [];
-    for (let i = 0; i < data.dataset.length; i++) {
-      results.push(new Array(data.dataset.length))
+
+    let maxPoints = 400;
+    let sampleCount = data.dataset.length
+
+    let stepSize = Math.max(1,Math.ceil(sampleCount/maxPoints))
+    let inv = 1/stepSize;
+
+    for (let i = 0; i < sampleCount; i += stepSize) {
+      results.push(new Array(Math.floor(data.dataset.length*inv)))
       labels.push(i)
     }
 
-    for (let i = 0; i < data.dataset.length - 1; i++) {
-      for (let j = i+1; j < data.dataset.length; j++) {
+    for (let i = 0; i < sampleCount - stepSize; i += stepSize) {
+      for (let j = i+stepSize; j < sampleCount; j += stepSize) {
         let [squaredDistance, similarItems] = getDistance(data.dataset[i], data.dataset[j]);
-        results[i][j] = squaredDistance;
-        // results[j][i] = squaredDistance;
+        results[i*inv][j*inv] = squaredDistance;
+        results[j*inv][i*inv] = squaredDistance;
       }
     }
 
@@ -97,7 +126,7 @@ export class Dataset {
     };
 
     let layout : Layout = {
-      title: "Squared distance between sample points",
+      title: `Squared distance between sample points (D=${stepSize})`,
       width: width,
       height: height,
       xaxis:{title:"samples"},
@@ -105,9 +134,10 @@ export class Dataset {
       ...PLOT_MARGINS,
     }
 
-
     stack([plotData], layout);
   }
+
+
 
 }
 

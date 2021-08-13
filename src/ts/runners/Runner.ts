@@ -25,7 +25,7 @@ export class Runner {
     this.fingerprintRef.writeToTempFile()
     for (let dataset of this.datasetRefArray) {
       // RUN IOS CLASSIFIER
-      let outputPath = dataset.getOutputPath('ios',this.outputPathAnnotation);
+      let outputPath = dataset.getOutputPath('ios', this.outputPathAnnotation);
       outputPaths.push(outputPath);
 
       let alreadyExists = FileUtil.fileExists(outputPath);

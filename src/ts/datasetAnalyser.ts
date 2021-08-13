@@ -17,5 +17,19 @@ async function run() {
   output.plotSummary();
 }
 
-run()
+async function plotDatasets() {
+  let sets = FileUtil.getDatasets();
+
+  let i = 0
+  for (let set of sets) {
+    i++;
+    if (i == 21) {
+      set.plotSummary(1300, 1000)
+    }
+  }
+
+}
+
+plotDatasets()
+// run()
 

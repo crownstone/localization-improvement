@@ -33,6 +33,7 @@ interface AppFingerprintFormat {
 interface AppDatasetFormat {
   sphereCloudId: string,
   sphere: SphereData,
+  annotation: string,
   location: {
     name: string,
     uid: LocationId,

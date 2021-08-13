@@ -8,14 +8,12 @@ export const DataMapper = {
     let result : FingerprintLibFileFormat = [];
     for (let sphereId in appFingerprintData.spheres) {
       let sphere = appFingerprintData.spheres[sphereId];
-      for (let locationId in sphere) {
-        if (locationId !== 'sphere') {
-          result.push({
-            sphereId,
-            locationId,
-            data: sphere[locationId].fingerprint
-          })
-        }
+      for (let locationId in sphere.fingerprints) {
+        result.push({
+          sphereId,
+          locationId,
+          data: sphere.fingerprints[locationId].fingerprint
+        })
       }
     }
     return result;
@@ -47,10 +45,10 @@ export const DataMapper = {
       let sphere = appFingerprintData.spheres[sphereId];
       for (let locationId in sphere.fingerprints) {
         let location = sphere.fingerprints[locationId];
-
         result.push({
           sphereCloudId: sphereId,
           sphere: sphere.sphere,
+          annotation: "Converted from fingerprint",
           location: {
             name: location.name,
             uid: locationId

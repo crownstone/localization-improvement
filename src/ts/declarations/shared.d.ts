@@ -11,6 +11,10 @@ interface LocationNameMap {
   }
 }
 
+interface SphereNameMap {
+  [sphereId: string]: string
+}
+
 interface OutputDataFormat {
   [sphereId: string]: {
     [expectedId: string]: {

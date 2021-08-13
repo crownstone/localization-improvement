@@ -88,7 +88,7 @@ export class TestSet {
     let runner = new Runner(this.fingerprint, dataset);
     let paths = await runner.start();
 
-    this.results[dataset.name] = new OutputData(paths[0], dataset, this._getLocationNameMap());
+    this.results[dataset.name] = new OutputData(paths[0], dataset, this.fingerprint, this._getLocationNameMap());
     return this.results[dataset.name];
   }
 
@@ -98,7 +98,7 @@ export class TestSet {
 
     // collecting output files...
     for (let i = 0; i < outputPaths.length; i++) {
-      this.results[this.datasets[i].name] = new OutputData(outputPaths[i], this.datasets[i], this._getLocationNameMap());
+      this.results[this.datasets[i].name] = new OutputData(outputPaths[i], this.datasets[i], this.fingerprint, this._getLocationNameMap());
     }
 
     this.clearAggregatedResults()

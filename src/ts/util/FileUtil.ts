@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 import {TMP_DATASET_PATH, TMP_OUTPUT_PATH_BASE, USER_PATH} from "../config";
 import {UserData} from "../dataContainers/UserData";
+import {Dataset} from "../dataContainers/Dataset";
+import {Fingerprint} from "../dataContainers/Fingerprint";
 
 export const FileUtil = {
 
@@ -24,6 +26,39 @@ export const FileUtil = {
     let basename = path.basename(datasetPath);
     return TMP_OUTPUT_PATH_BASE + `output_${platform}_${annotation}_${basename}`
   },
+
+  getDatasets: function() : Dataset[] {
+    let users = FileUtil.getUsers();
+    let datasets : Dataset[] = [];
+    for (let userName in users) {
+      let user = users[userName];
+      for (let scenarioName in user.scenarios) {
+        let scenario = user.scenarios[scenarioName]
+        let datasetFilePaths = FileUtil.getJSONFilePaths(scenario.path);
+        for (let filePath of datasetFilePaths) {
+          datasets.push(new Dataset(filePath))
+        }
+      }
+    }
+    return datasets;
+  },
+
+  getFingerprints: function() : Fingerprint[] {
+    let users = FileUtil.getUsers();
+    let fingerprints : Fingerprint[] = [];
+    for (let userName in users) {
+      let user = users[userName];
+      for (let scenarioName in user.scenarios) {
+        let scenario = user.scenarios[scenarioName]
+        let datasetFilePaths = FileUtil.getJSONFilePaths(path.join(scenario.path, 'fingerprints'));
+        for (let filePath of datasetFilePaths) {
+          fingerprints.push(new Fingerprint(filePath))
+        }
+      }
+    }
+    return fingerprints;
+  },
+
 
   getUsers: function() : {[userName: string] : UserData } {
     let items = FileUtil.getDirectoryPaths(USER_PATH)
