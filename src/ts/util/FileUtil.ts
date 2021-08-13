@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import {TMP_DATASET_PATH, TMP_OUTPUT_PATH_BASE, USER_PATH} from "../config";
-import {UserData} from "../dataContainers/User";
+import {UserData} from "../dataContainers/UserData";
 
 export const FileUtil = {
 
@@ -20,12 +20,9 @@ export const FileUtil = {
     return JSON.parse(data) as T
   },
 
-  getOutputPath: function(datasetPath: string, annotation? : string) {
+  getOutputPath: function(datasetPath: string, platform: Platform, annotation? : string) {
     let basename = path.basename(datasetPath);
-    if (annotation) {
-      return TMP_OUTPUT_PATH_BASE + "output_" + annotation + "_" + basename
-    }
-    return TMP_OUTPUT_PATH_BASE + "output_" + basename
+    return TMP_OUTPUT_PATH_BASE + `output_${platform}_${annotation}_${basename}`
   },
 
   getUsers: function() : {[userName: string] : UserData } {

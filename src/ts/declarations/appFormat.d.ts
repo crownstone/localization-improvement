@@ -9,7 +9,7 @@ interface SphereData {
   updatedAt: string | Timestamp
 }
 
-// FingerprintSet
+// Fingerprint
 interface FingerprintDatapoint {
   devices: DevicesData,
   timestamp: Timestamp

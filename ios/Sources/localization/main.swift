@@ -68,14 +68,14 @@ struct LocalizationSet: ParsableCommand {
                             "sphereId":      sphereId,
                             "result":        NaiveBayesianResult as Any,
                             "expectedLabel": data["label"].stringValue,
-                            "probabilities": naiveBayesianClassifier.getProbabilities(sphereId) as Any
+//                            "probabilities": naiveBayesianClassifier.getProbabilities(sphereId) as Any
                         ])
             
             kNNResults.append([
                             "sphereId":      sphereId,
                             "result":        kNNResult as Any,
                             "expectedLabel": data["label"].stringValue,
-                            "distanceMap":   knnClassifier.getDistanceMap(sphereId) as Any
+//                            "distanceMap":   knnClassifier.getDistanceMap(sphereId) as Any
                         ])
         }
         

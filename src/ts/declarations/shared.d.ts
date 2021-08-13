@@ -4,4 +4,18 @@ type DeviceUUID  = string; // <ibeaconUUID>_Maj:<ibeaconMajor>_Min:<ibeaconMinor
 type LocationId  = string;
 type DevicesData = Record<DeviceUUID, Rssi>
 
-interface LocationNameMap { [sphereId: string]: {[locationId: string]: string}}
+type Platform = 'ios' | 'android'
+interface LocationNameMap {
+  [sphereId: string]: {
+    [locationId: string]: string
+  }
+}
+
+interface OutputDataFormat {
+  [sphereId: string]: {
+    [expectedId: string]: {
+      [locationId: string]: number
+    }
+  }
+}
+

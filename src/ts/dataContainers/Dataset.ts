@@ -1,5 +1,5 @@
 import path from "path";
-import {TMP_DATASET_PATH} from "../config";
+import {PLOT_DEFAULT_HEIGHT, PLOT_DEFAULT_WIDTH, PLOT_MARGINS, TMP_DATASET_PATH} from "../config";
 import {FileUtil} from "../util/FileUtil";
 import {DataMapper} from "../util/DataMappers";
 import {Layout, plot, Plot, stack} from "nodeplotlib";
@@ -8,7 +8,7 @@ export class Dataset {
 
   name : string = null;
   path : string = null;
-  data : AppDatasetFormat;
+  _data : AppDatasetFormat;
 
   constructor(datasetPath: string | null = null) {
     if (datasetPath) {
@@ -18,9 +18,9 @@ export class Dataset {
   }
 
   getAppData() : AppDatasetFormat {
-    if (this.data) { return this.data; }
-    this.data = FileUtil.readJSON<AppDatasetFormat>(this.path);
-    return this.data;
+    if (this._data) { return this._data; }
+    this._data = FileUtil.readJSON<AppDatasetFormat>(this.path);
+    return this._data;
   }
 
   getLibData() : DatasetFileLibFormat {
@@ -31,8 +31,8 @@ export class Dataset {
     FileUtil.store(tmpFilePath, this.getLibData());
   }
 
-  getOutputPath(annotation?: string) : string {
-    return FileUtil.getOutputPath(this.path, annotation);
+  getOutputPath(platform: Platform, annotation?: string) : string {
+    return FileUtil.getOutputPath(this.path, platform, annotation);
   }
 
   getRandomSample() : FingerprintDatapoint {
@@ -42,20 +42,37 @@ export class Dataset {
     return samples[index];
   }
 
-  getDistanceReport(stackPlot=false) {
+  plotOffsetGraph(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
     let data = this.getAppData();
 
-    function getDistance(a : FingerprintDatapoint, b: FingerprintDatapoint) {
-      let squaredDistance = 0;
-      let similarItems = 0;
-      for (let deviceId in a.devices) {
-        if (b.devices[deviceId]) {
-          similarItems++;
-          squaredDistance += Math.pow(a.devices[deviceId] - b.devices[deviceId], 2);
-        }
-      }
-      return [Math.sqrt(squaredDistance), similarItems];
+    let results = []
+    let labels = [];
+    for (let i = 0; i < data.dataset.length; i++) {
+      results.push(new Array(data.dataset.length))
+      labels.push(i)
     }
+
+    let result = []
+
+    for (let i = 1; i < data.dataset.length; i++) {
+      let [squaredDistance, similarItems] = getDistance(data.dataset[i-1], data.dataset[i]);
+      result.push(squaredDistance)
+    }
+
+    let layout : Layout = {
+      title: "Squared distance between sequantial samples (movement estimate)",
+      width: width,
+      height: height,
+      xaxis:{title:"samples"},
+      yaxis:{title:"squared distance"},
+      ...PLOT_MARGINS,
+    }
+
+    stack([{y:result}], layout);
+  }
+
+  plotDistanceReport(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
+    let data = this.getAppData();
 
     let results = []
     let labels = [];
@@ -72,27 +89,36 @@ export class Dataset {
       }
     }
 
-    let plotData : Plot[] = [{
+    let plotData : Plot = {
       x: labels,
       y: labels,
       z: results,
       type: 'heatmap',
-    }];
+    };
+
     let layout : Layout = {
-      title: this.name,
-      autosize:false,
-      height: 800,
-      width: 800,
-
+      title: "Squared distance between sample points",
+      width: width,
+      height: height,
+      xaxis:{title:"samples"},
+      yaxis:{title:"samples"},
+      ...PLOT_MARGINS,
     }
 
-    if (stackPlot) {
-      stack(plotData, layout)
-    }
-    else {
-      plot(plotData, layout);
-    }
+
+    stack([plotData], layout);
   }
 
+}
 
+function getDistance(a : FingerprintDatapoint, b: FingerprintDatapoint) {
+  let squaredDistance = 0;
+  let similarItems = 0;
+  for (let deviceId in a.devices) {
+    if (b.devices[deviceId]) {
+      similarItems++;
+      squaredDistance += Math.pow(a.devices[deviceId] - b.devices[deviceId], 2);
+    }
+  }
+  return [squaredDistance, similarItems];
 }

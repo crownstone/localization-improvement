@@ -5,7 +5,10 @@ import {FileUtil} from "../util/FileUtil";
 import {DataMapper} from "../util/DataMappers";
 
 
-export class FingerprintsBase {
+export class FingerprintBase {
+
+  name: string;
+
   getLibData() : FingerprintLibFileFormat {
     throw "MUST_BE_IMPLEMENTED"
   }
@@ -20,7 +23,7 @@ export class FingerprintsBase {
 }
 
 
-// export class FingerprintsBuilder extends FingerprintsBase {
+// export class FingerprintsBuilder extends FingerprintBase {
 //
 //   sphereId:     string;
 //   locations:  { [locationId: string]: FingerprintDatapoint[] } = {};
@@ -64,7 +67,7 @@ export class FingerprintsBase {
 //   }
 // }
 
-export class FingerprintSet extends FingerprintsBase {
+export class Fingerprint extends FingerprintBase {
 
   name : string;
   path : string;
@@ -88,7 +91,9 @@ export class FingerprintSet extends FingerprintsBase {
       result[sphereId] = {};
       let locations = this.data.spheres[sphereId];
       for (let locationId in locations) {
-        result[sphereId][locationId] = locations[locationId].name;
+        if (locationId !== 'sphere') {
+          result[sphereId][locationId] = locations[locationId].name;
+        }
       }
     }
     return result;
@@ -103,7 +108,7 @@ export class FingerprintSet extends FingerprintsBase {
     let result : Dataset[] = [];
     for (let set of datasets) {
       let dataset = new Dataset();
-      dataset.data = set;
+      dataset._data = set;
       result.push(dataset);
     }
     return result;
