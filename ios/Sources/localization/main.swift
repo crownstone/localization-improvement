@@ -42,12 +42,13 @@ struct LocalizationSet: ParsableCommand {
             naiveBayesianClassifier.loadTrainingData(
                 json["locationId"].stringValue,
                 referenceId: json["sphereId"].stringValue,
-                trainingData: json["data"].stringValue
+                trainingData: json["data"].rawString()!
             )
+            
             knnClassifier.loadTrainingData(
                 json["locationId"].stringValue,
                 referenceId: json["sphereId"].stringValue,
-                trainingData: json["data"].stringValue
+                trainingData: json["data"].rawString()!
             )
         }
 
@@ -61,21 +62,21 @@ struct LocalizationSet: ParsableCommand {
             for point in data["in"].arrayValue {
                 inputVector.append(iBeaconPacket(idString: point[0].stringValue, rssi: point[1].numberValue))
             }
-
+            
             let NaiveBayesianResult = naiveBayesianClassifier.classifyRaw(inputVector, referenceId: sphereId)
             let kNNResult = knnClassifier.classify(inputVector, referenceId: sphereId)
             NaiveBayesianResults.append([
                             "sphereId":      sphereId,
                             "result":        NaiveBayesianResult as Any,
                             "expectedLabel": data["label"].stringValue,
-//                            "probabilities": naiveBayesianClassifier.getProbabilities(sphereId) as Any
+                            "probabilities": naiveBayesianClassifier.getProbabilities(sphereId) as Any
                         ])
             
             kNNResults.append([
                             "sphereId":      sphereId,
                             "result":        kNNResult as Any,
                             "expectedLabel": data["label"].stringValue,
-//                            "distanceMap":   knnClassifier.getDistanceMap(sphereId) as Any
+                            "distanceMap":   knnClassifier.getDistanceMap(sphereId) as Any
                         ])
         }
         

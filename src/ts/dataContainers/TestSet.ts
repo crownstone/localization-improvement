@@ -76,7 +76,7 @@ export class TestSet {
     throw new Error("Could not find dataset");
   }
 
-  async run(datasetName: string | Dataset) : Promise<OutputData> {
+  async run(datasetName: string | Dataset, overwrite = false) : Promise<OutputData> {
     let dataset;
     if (typeof datasetName === 'string') {
       dataset = this._getDatasetByName(datasetName);
@@ -86,15 +86,15 @@ export class TestSet {
     }
 
     let runner = new Runner(this.fingerprint, dataset);
-    let paths = await runner.start();
+    let paths = await runner.start(overwrite);
 
     this.results[dataset.name] = new OutputData(paths[0], dataset, this.fingerprint, this._getLocationNameMap());
     return this.results[dataset.name];
   }
 
-  async runAll() : Promise<OutputData[]> {
+  async runAll(overwrite = false) : Promise<OutputData[]> {
     let runner = new Runner(this.fingerprint, this.datasets, this.fingerprint.name.replace(".json",''));
-    let outputPaths = await runner.start();
+    let outputPaths = await runner.start(overwrite);
 
     // collecting output files...
     for (let i = 0; i < outputPaths.length; i++) {

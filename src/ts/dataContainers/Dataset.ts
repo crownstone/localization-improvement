@@ -6,9 +6,15 @@ import {Layout, plot, Plot, stack} from "nodeplotlib";
 
 export class Dataset {
 
-  name : string = null;
-  path : string = null;
-  _data : AppDatasetFormat;
+  name         : string = null;
+  path         : string = null;
+
+  sphereId     : string = null;
+  sphereName   : string = null;
+  locationName : string = null;
+  locationUid  : string = null;
+
+  _data        : AppDatasetFormat;
 
   constructor(datasetPath: string | null = null) {
     if (datasetPath) {
@@ -17,9 +23,17 @@ export class Dataset {
     }
   }
 
+  setData(data: AppDatasetFormat) {
+    this._data = data;
+    this.locationName = this._data?.location?.name  || "UNKNOWN"
+    this.locationUid   = this._data?.location?.uid   || "UNKNOWN"
+    this.sphereName   = this._data?.sphere?.name    || "UNKNOWN"
+    this.sphereId     = this._data?.sphere?.cloudId || "UNKNOWN"
+  }
+
   getAppData() : AppDatasetFormat {
     if (this._data) { return this._data; }
-    this._data = FileUtil.readJSON<AppDatasetFormat>(this.path);
+    this.setData(FileUtil.readJSON<AppDatasetFormat>(this.path));
     return this._data;
   }
 
@@ -42,11 +56,14 @@ export class Dataset {
     return samples[index];
   }
 
-  plotSummary(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
+  plotSummary(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT, doPlot= true) {
     this.plotDistanceReport(  width, height);
     this.plotSampleSizeGraph( width, 0.5*height);
     this.plotOffsetGraph(     width, 0.5*height);
-    plot();
+
+    if (doPlot) {
+      plot();
+    }
   }
 
   plotOffsetGraph(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
@@ -93,40 +110,13 @@ export class Dataset {
     stack([{y:result}], layout);
   }
 
-  plotDistanceReport(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
+  plotDistanceReport(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT, title = undefined) {
     let data = this.getAppData();
 
-    let results = []
-    let labels = [];
-
-    let maxPoints = 400;
-    let sampleCount = data.dataset.length
-
-    let stepSize = Math.max(1,Math.ceil(sampleCount/maxPoints))
-    let inv = 1/stepSize;
-
-    for (let i = 0; i < sampleCount; i += stepSize) {
-      results.push(new Array(Math.floor(data.dataset.length*inv)))
-      labels.push(i)
-    }
-
-    for (let i = 0; i < sampleCount - stepSize; i += stepSize) {
-      for (let j = i+stepSize; j < sampleCount; j += stepSize) {
-        let [squaredDistance, similarItems] = getDistance(data.dataset[i], data.dataset[j]);
-        results[i*inv][j*inv] = squaredDistance;
-        results[j*inv][i*inv] = squaredDistance;
-      }
-    }
-
-    let plotData : Plot = {
-      x: labels,
-      y: labels,
-      z: results,
-      type: 'heatmap',
-    };
+    let [plotData, stepSize] = compareByDistance(data.dataset, data.dataset);
 
     let layout : Layout = {
-      title: `Squared distance between sample points (D=${stepSize})`,
+      title: title || `Squareds distance between sample points (D=${stepSize})`,
       width: width,
       height: height,
       xaxis:{title:"samples"},
@@ -151,4 +141,53 @@ function getDistance(a : FingerprintDatapoint, b: FingerprintDatapoint) {
     }
   }
   return [squaredDistance, similarItems];
+}
+
+
+export function compareByDistance(set1 : FingerprintDatapoint[], set2: FingerprintDatapoint[], useSimilarItems = false) : [Plot, number] {
+  let results = []
+  let labelsX = [];
+  let labelsY = [];
+
+  let maxPoints = 400*400;
+  let sampleCount = set1.length * set2.length
+
+  let stepSize = Math.max(1,Math.ceil(sampleCount/maxPoints))
+  let inv = 1/stepSize;
+
+  for (let i = 0; i < set1.length; i += stepSize) {
+    results.push(new Array(Math.floor(set2.length*inv)))
+    labelsY.push(i)
+  }
+  for (let i = 0; i < set2.length; i += stepSize) {
+    labelsX.push(i)
+  }
+
+  for (let i = 0; i < set1.length; i += stepSize) {
+    for (let j = 0; j < set2.length; j += stepSize) {
+      let [squaredDistance, similarItems] = getDistance(set1[i], set2[j]);
+      if (useSimilarItems) {
+        results[i*inv][j*inv] = similarItems;
+      }
+      else {
+        results[i*inv][j*inv] = squaredDistance;
+      }
+    }
+  }
+
+  let plotData : Plot = {
+    x: labelsX,
+    y: labelsY,
+    z: results,
+    type: 'heatmap',
+    colorscale: [
+      [0.0, "#fff"],
+      [0.000001, "#00172c"],
+      [0.49, "#b1eb76"],
+      [1.0, "#ff0000"]
+    ]
+  };
+
+
+  return [plotData, stepSize]
 }

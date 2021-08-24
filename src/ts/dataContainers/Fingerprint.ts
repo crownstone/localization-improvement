@@ -1,8 +1,9 @@
 import path from "path";
-import {Dataset} from "./Dataset";
-import {PLOT_DEFAULT_HEIGHT, PLOT_DEFAULT_WIDTH, TMP_FINGERPRINT_PATH} from "../config";
+import {compareByDistance, Dataset} from "./Dataset";
+import {PLOT_DEFAULT_HEIGHT, PLOT_DEFAULT_WIDTH, PLOT_MARGINS, TMP_FINGERPRINT_PATH} from "../config";
 import {FileUtil} from "../util/FileUtil";
 import {DataMapper} from "../util/DataMappers";
+import {Layout, plot, stack} from "nodeplotlib";
 
 
 export class FingerprintBase {
@@ -127,7 +128,7 @@ export class Fingerprint extends FingerprintBase {
     let result : Dataset[] = [];
     for (let set of datasets) {
       let dataset = new Dataset();
-      dataset._data = set;
+      dataset.setData(set);
       result.push(dataset);
     }
     return result;
@@ -136,8 +137,40 @@ export class Fingerprint extends FingerprintBase {
   plotSummary(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
     let datasets = this.convertToDatasets();
     for (let dataset of datasets) {
-      dataset.plotSummary(width, height)
+      dataset.plotDistanceReport(width, height, `${dataset.sphereName}:${dataset.locationName}`);
     }
+    plot()
+  }
+
+  compareLocations(sphereId : string, locationUid1: string | number, locationUid2: string | number, width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
+    let datasets = this.convertToDatasets()
+    let dataset1 = getDataset(sphereId, String(locationUid1), datasets);
+    let dataset2 = getDataset(sphereId, String(locationUid2), datasets);
+    let [plotData, stepSize] = compareByDistance(dataset1._data.dataset, dataset2._data.dataset);
+
+    let layout : Layout = {
+      title: `Distance between ${dataset1.locationName} and ${dataset2.locationName} (D=${stepSize})`,
+      width: width,
+      height: height,
+      xaxis:{title:dataset2.locationName},
+      yaxis:{title:dataset1.locationName},
+      ...PLOT_MARGINS,
+    }
+
+    stack([plotData], layout);
+    let [plotData2, stepSize2] = compareByDistance(dataset1._data.dataset, dataset2._data.dataset, true);
+
+    let layout2 : Layout = {
+      title: `Compared items ${dataset1.locationName} and ${dataset2.locationName} (D=${stepSize})`,
+      width: width,
+      height: height,
+      xaxis:{title:dataset2.locationName},
+      yaxis:{title:dataset1.locationName},
+      ...PLOT_MARGINS,
+    }
+
+    stack([plotData2], layout);
+    plot()
   }
 
   getRandomSample(sphereId: string, locationId: string) : FingerprintDatapoint {
@@ -148,3 +181,15 @@ export class Fingerprint extends FingerprintBase {
   }
 }
 
+function getDataset(sphereId: string, locationUid: string, datasets: Dataset[]) {
+  for (let set of datasets) {
+    if (!set._data) {
+      set.getAppData();
+    }
+
+    if (set.sphereId === sphereId && locationUid === set.locationUid) {
+      return set;
+    }
+  }
+  throw new Error("Dataset not found.");
+}
