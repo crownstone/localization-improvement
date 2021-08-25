@@ -15,7 +15,7 @@ export class UserData {
     this.name = path.basename(userPath);
     let scenarioPaths = FileUtil.getDirectoryPaths(userPath);
     for (let scenarioPath of scenarioPaths) {
-      let data = new Scenario(scenarioPath);
+      let data = new Scenario(scenarioPath, this.name);
       this.scenarios[data.name] = data;
     }
 

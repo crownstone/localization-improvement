@@ -108,20 +108,20 @@ The output data is a dataset that is outputted by one of the classifiers. It has
 The output data has a number of visualization options:
 - SuccessRate
   - A bar graph showing the success percentage per classifier.
-    ![sample_size_graph](./images/sample_size_graph.png)
+    ![successRate](./images/successRate.png)
 - LocalizationBarGraph
   - A bar graph showing the distribution of the classifications.
-    ![sample_size_graph](./images/sample_size_graph.png)
+    ![classificationDistribution](./images/classificationDistribution.png)
 - ClassificationGraph
-  - A bar graph showing the classified room for each sample for each classifier.
-    ![sample_size_graph](./images/sample_size_graph.png)
+  - A line graph showing the classified room for each sample for each classifier.
+    ![classificationOverTime](./images/classificationOverTime.png)
 
 
 ### OutputDataAggeragator
 This class can combine any number of Output Data classes, as well as merge with other OutputDataAggragators. Each TestCase has one Aggregator, which automatically aggregates on a runAll call.
 A Collective also has one OutputDataAggregator, which merges with all the ones in the contained testCases.
 - it can plot a confusion map per sphere. Each sphere with samples will be plotted in a new window. Spheres and locations are obtained from the fingerprints in the testSets.
-   ![sample_size_graph](./images/sample_size_graph.png)
+   ![confusionMatrixKNN](./images/confusionMatrixKNN.png)
 
 
 # Util and Tooling

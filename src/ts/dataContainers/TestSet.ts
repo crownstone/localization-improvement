@@ -7,14 +7,20 @@ import {OutputDataAggregator} from "./OutputDataAggregator";
 
 export class TestSet {
 
-  name: string;
-  fingerprint  : FingerprintBase;
-  datasets     : Dataset[] = [];
+  userName      : string;
+  scenarioName  : string;
+
+  name          : string;
+  fingerprint   : FingerprintBase;
+  datasets      : Dataset[] = [];
 
   results          : {[datasetName: string] : OutputData } = {};
   aggregatedResult : OutputDataAggregator;
 
-  constructor(scenarioPath?: string, fingerprintPath?: string) {
+  constructor(scenarioPath?: string, fingerprintPath?: string, scenarioName: string = "UnknownScenario", userName: string = "UnknownUser") {
+    this.userName = userName;
+    this.scenarioName = scenarioName;
+
     if (fingerprintPath) {
       this.loadFingerprint(fingerprintPath)
     }
@@ -85,15 +91,21 @@ export class TestSet {
       dataset = datasetName;
     }
 
-    let runner = new Runner(this.fingerprint, dataset);
+    let runner = new Runner(this.fingerprint, dataset, this._getOutputAnnotation());
     let paths = await runner.start(overwrite);
 
     this.results[dataset.name] = new OutputData(paths[0], dataset, this.fingerprint, this._getLocationNameMap());
     return this.results[dataset.name];
   }
 
+  _getOutputAnnotation() : string {
+    let annotation = `${this.userName}_${this.scenarioName}_${this.fingerprint.name.replace(".json",'')}`
+    return annotation;
+  }
+
+
   async runAll(overwrite = false) : Promise<OutputData[]> {
-    let runner = new Runner(this.fingerprint, this.datasets, this.fingerprint.name.replace(".json",''));
+    let runner = new Runner(this.fingerprint, this.datasets, this._getOutputAnnotation());
     let outputPaths = await runner.start(overwrite);
 
     // collecting output files...

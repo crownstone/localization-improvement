@@ -81,7 +81,8 @@ export class OutputDataAggregatorContainer {
 
     if (!hasDatapoints) { return false; }
 
-    let labels = locationDataObjects.map(a => a.label)
+    let labelsX = locationDataObjects.map(a => `truth:${a.label}`)
+    let labelsY = locationDataObjects.map(a => `${a.label}`)
 
     let colorscaleValue : ColorScale = [
       [0, '#3D9970'],
@@ -89,8 +90,8 @@ export class OutputDataAggregatorContainer {
     ];
 
     let data : Plot[] = [{
-      x: labels,
-      y: labels,
+      x: labelsX,
+      y: labelsY,
       z: zValues,
       type: 'heatmap',
       colorscale: colorscaleValue,
@@ -101,9 +102,9 @@ export class OutputDataAggregatorContainer {
       title: 'ConfusionMatrix ' + this.type + " for sphere " + sphereId,
       annotations: [],
       autosize:false,
-      height: labels.length*50,
-      width: labels.length*100,
-      margin: {l: 120, t: 180},
+      height: labelsY.length*50,
+      width: labelsX.length*100,
+      margin: {l: 150, t: 180},
       xaxis: {
         ticks: '',
         side: 'top',
@@ -116,8 +117,8 @@ export class OutputDataAggregatorContainer {
       },
     };
 
-    for ( let i = 0; i < labels.length; i++ ) {
-      for ( let j = 0; j < labels.length; j++ ) {
+    for ( let i = 0; i < labelsX.length; i++ ) {
+      for ( let j = 0; j < labelsY.length; j++ ) {
         let currentValue = zValues[j][i];
         let textColor = 'black';
         if (currentValue != 0.0) {
@@ -126,8 +127,8 @@ export class OutputDataAggregatorContainer {
         let result : Partial<Annotations> = {
           // xref: 'x1',
           // yref: 'YAxisName',
-          x: labels[i],
-          y: labels[j],
+          x: labelsX[i],
+          y: labelsY[j],
           text: String(zValues[j][i]),
           font: {
             color: textColor

@@ -1,0 +1,24 @@
+{
+  "sphereCloudId": "58de6bda62a2241400f10c67",
+  "sphere": {
+    "name": "Noordweg 16",
+    "iBeaconUUID": "d8b094e7-569c-4bc6-8637-e11ce4221c18",
+    "uid": 246,
+    "cloudId": "58de6bda62a2241400f10c67",
+    "aiName": "Warden",
+    "latitude": 52.019599295050284,
+    "longitude": 4.429502832477937,
+    "updatedAt": "2021-05-08T16:23:24.186Z"
+  },
+  "annotation": "",
+  "device": {
+    "name": "iPhone",
+    "deviceType": "iPhone6,2",
+    "model": "iPhone 5s"
+  },
+  "location": {
+    "name": "Gang Boven",
+    "uid": "14"
+  },
+  "dataset": []
+}

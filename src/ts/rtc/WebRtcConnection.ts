@@ -80,7 +80,7 @@ export class RtcConnectionHandler {
     }, 400)
 
     try {
-      console.log("Collecting data");
+      console.log("Collecting data", data.fileName, data.part);
       this.fileInProgress.collect(data);
       if (this.fileInProgress.finished) {
         console.log("is finished")

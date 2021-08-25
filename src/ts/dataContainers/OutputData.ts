@@ -100,7 +100,7 @@ export class OutputData {
     this.plotSuccessRate(            width, height);
     this.plotLocalizationBarGraph(   width, height);
     this.plotClassificationGraph(    width, height);
-    this.dataset.plotDistanceReport( width, height);
+    this.dataset.plotDistanceReport( width, height*1.75);
     this.dataset.plotOffsetGraph(    width, height);
     this.dataset.plotSampleSizeGraph(width, height);
     plot();

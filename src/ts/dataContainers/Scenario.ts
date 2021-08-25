@@ -4,18 +4,21 @@ import {TestSet} from "./TestSet";
 
 export class Scenario {
 
+  userName     : string;
+
   name         : string;
   path         : string;
   sets         : TestSet[] = []
 
-  constructor(scenarioPath: string) {
+  constructor(scenarioPath: string, userName: string = "UNKNOWN") {
+    this.userName = userName;
     this.name = path.basename(scenarioPath);
     this.path = scenarioPath;
 
     let fingerprintFiles = FileUtil.getJSONFilePaths(path.join(scenarioPath, 'fingerprints'));
 
     for (let fingerprintPath of fingerprintFiles) {
-      this.sets.push(new TestSet(scenarioPath, fingerprintPath));
+      this.sets.push(new TestSet(scenarioPath, fingerprintPath, this.name, this.userName));
     }
   }
 

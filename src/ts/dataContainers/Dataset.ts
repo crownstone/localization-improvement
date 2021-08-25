@@ -116,7 +116,7 @@ export class Dataset {
     let [plotData, stepSize] = compareByDistance(data.dataset, data.dataset);
 
     let layout : Layout = {
-      title: title || `Squareds distance between sample points (D=${stepSize})`,
+      title: title || `Squared distance between sample points (D=${stepSize})`,
       width: width,
       height: height,
       xaxis:{title:"samples"},

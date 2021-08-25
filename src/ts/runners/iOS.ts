@@ -3,7 +3,7 @@ import {TMP_DATASET_PATH, TMP_FINGERPRINT_PATH} from "../config";
 
 const packagePath = `${__dirname}/../../../ios`
 
-export async function runIOS(outputPath, silent=false) : Promise<void> {
+export async function runIOS(outputPath, silent= true) : Promise<void> {
   return new Promise((resolve, reject) => {
     const callback = function (error, stdout, stderr) {
       if (error) {
