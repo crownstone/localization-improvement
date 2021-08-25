@@ -45,11 +45,11 @@ export const LocalizationDataUtil = {
   },
 
   getFingerprintFilePath: function(data: RtcLocalizationFileTransfer) : string {
-    return path.join(LocalizationDataUtil.getFingerprintDirPath(data), `${data.fileName}.tmp`);
+    return path.join(LocalizationDataUtil.getFingerprintDirPath(data), `${data.fileName.replace(/:/g,"_")}.tmp`);
   },
 
   getDatasetFilePath: function(data: RtcLocalizationFileTransfer) : string {
-    return path.join(LocalizationDataUtil.getDatasetDirPath(data), data.fileName);
+    return path.join(LocalizationDataUtil.getDatasetDirPath(data), data.fileName.replace(/:/g,"_"));
   },
 
   isFingerprint: function(data : RtcLocalizationFileTransfer) : boolean {
