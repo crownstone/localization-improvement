@@ -10,6 +10,8 @@ import {
 import {FileUtil} from "../util/FileUtil";
 import {DataMapper} from "../util/DataMappers";
 import {Layout, plot, stack} from "nodeplotlib";
+import {Util} from "../util/Util";
+import {DataTransform} from "../util/DataTransform";
 
 
 export class FingerprintBase {
@@ -83,7 +85,7 @@ export class FingerprintsBuilder extends FingerprintBase {
       })
     }
 
-    applyRssiThreshold(result);
+    applySimulationConfig(result);
     return result;
   }
 }
@@ -129,7 +131,7 @@ export class Fingerprint extends FingerprintBase {
 
   getLibData() : FingerprintLibFileFormat {
     let libData = DataMapper.AppFingerprintToLibs(this.getAppData());
-    applyRssiThreshold(libData);
+    applySimulationConfig(libData);
     return libData;
   }
 
@@ -205,18 +207,50 @@ function getDataset(sphereId: string, locationUid: string, datasets: Dataset[]) 
   throw new Error("Dataset not found.");
 }
 
+function applySimulationConfig(fingerprints: FingerprintLibFileFormat) {
+  applyRssiThreshold(fingerprints);
+  if (SIMULATION_CONFIG.interpolation.fingerprint === true && SIMULATION_CONFIG.interpolation.type === "rssi") {
+    applyInterpolation(fingerprints);
+    applyDistanceConversion(fingerprints);
+  }
+  else if (SIMULATION_CONFIG.interpolation.fingerprint === true && SIMULATION_CONFIG.interpolation.type === "distance") {
+    applyDistanceConversion(fingerprints);
+    applyInterpolation(fingerprints);
+  }
+  else { // interpolation disabled.
+    applyDistanceConversion(fingerprints);
+  }
+}
+
 function applyRssiThreshold(fingerprints: FingerprintLibFileFormat) {
   if (SIMULATION_CONFIG.fingerprints.rssiUpperThreshold === -100) {
     return;
   }
 
   for (let fingerprintSet of fingerprints) {
-    for (let datapoint of fingerprintSet.data) {
-      for (let deviceId in datapoint.devices) {
-        if (datapoint.devices[deviceId] < SIMULATION_CONFIG.fingerprints.rssiUpperThreshold) {
-          delete datapoint.devices[deviceId];
-        }
-      }
-    }
+    DataTransform.applyRssiThreshold(fingerprintSet.data, SIMULATION_CONFIG.fingerprints.rssiUpperThreshold);
   }
 }
+
+function applyDistanceConversion(fingerprints: FingerprintLibFileFormat) {
+  if (SIMULATION_CONFIG.conversion.rssiToDistance === false) {
+    return;
+  }
+
+  for (let fingerprintSet of fingerprints) {
+    DataTransform.applyDistanceConversion(fingerprintSet.data);
+  }
+}
+
+
+function applyInterpolation(fingerprints: FingerprintLibFileFormat) {
+  if (SIMULATION_CONFIG.interpolation.fingerprint === false) {
+    return;
+  }
+
+
+  for (let fingerprintSet of fingerprints) {
+    DataTransform.applyInterpolation(fingerprintSet.data, true);
+  }
+}
+

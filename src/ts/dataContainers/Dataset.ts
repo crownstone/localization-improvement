@@ -3,6 +3,8 @@ import {PLOT_DEFAULT_HEIGHT, PLOT_DEFAULT_WIDTH, PLOT_MARGINS, SIMULATION_CONFIG
 import {FileUtil} from "../util/FileUtil";
 import {DataMapper} from "../util/DataMappers";
 import {Layout, plot, Plot, stack} from "nodeplotlib";
+import {Util} from "../util/Util";
+import {DataTransform} from "../util/DataTransform";
 
 export class Dataset {
 
@@ -38,8 +40,8 @@ export class Dataset {
   }
 
   getLibData() : DatasetFileLibFormat {
-    let libData = DataMapper.AppDatasetToLibs(this.getAppData());
-    applyRssiThreshold(libData);
+    let converted = applySimulationConfig(this.getAppData());
+    let libData = DataMapper.AppDatasetToLibs(converted);
     return libData
   }
 
@@ -247,16 +249,48 @@ export function compareByDistance(set1 : FingerprintDatapoint[], set2: Fingerpri
   return [plotData, stepSize]
 }
 
-function applyRssiThreshold(dataset: DatasetFileLibFormat) {
+
+function applySimulationConfig(dataset: AppDatasetFormat) {
+  let convertedSet : AppDatasetFormat = Util.deepCopy(dataset)
+
+  applyRssiThreshold(convertedSet);
+  if (SIMULATION_CONFIG.interpolation.datasets === true && SIMULATION_CONFIG.interpolation.type === "rssi") {
+    applyInterpolation(convertedSet);
+    applyDistanceConversion(convertedSet);
+  }
+  else if (SIMULATION_CONFIG.interpolation.datasets === true && SIMULATION_CONFIG.interpolation.type === "distance") {
+    applyDistanceConversion(convertedSet);
+    applyInterpolation(convertedSet);
+  }
+  else { // interpolation disabled.
+    applyDistanceConversion(convertedSet);
+  }
+
+  return convertedSet;
+}
+
+function applyRssiThreshold(dataset: AppDatasetFormat) {
   if (SIMULATION_CONFIG.datasets.rssiUpperThreshold === -100) {
     return;
   }
 
-  for (let item of dataset) {
-    for (let i = item.in.length - 1; i >= 0; i--) {
-      if (item.in[i][1] < SIMULATION_CONFIG.fingerprints.rssiUpperThreshold) {
-        item.in.splice(i,1);
-      }
-    }
+  DataTransform.applyRssiThreshold(dataset.dataset, SIMULATION_CONFIG.datasets.rssiUpperThreshold);
+}
+
+
+function applyDistanceConversion(dataset: AppDatasetFormat) {
+  if (SIMULATION_CONFIG.conversion.rssiToDistance === false) {
+    return;
   }
+
+  DataTransform.applyDistanceConversion(dataset.dataset)
+}
+
+
+function applyInterpolation(dataset: AppDatasetFormat) {
+  if (SIMULATION_CONFIG.interpolation.datasets === false) {
+    return;
+  }
+
+  DataTransform.applyInterpolation(dataset.dataset, false);
 }
