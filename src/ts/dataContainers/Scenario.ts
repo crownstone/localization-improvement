@@ -8,7 +8,7 @@ export class Scenario {
 
   name         : string;
   path         : string;
-  sets         : {[fingerprintName: string]: TestSet};
+  sets         : {[fingerprintName: string]: TestSet} = {};
 
   constructor(scenarioPath: string, userName: string = "UNKNOWN") {
     this.userName = userName;

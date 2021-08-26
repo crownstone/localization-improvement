@@ -36,59 +36,59 @@ export class FingerprintBase {
 }
 
 
-export class FingerprintsBuilder extends FingerprintBase {
-
-  sphereId:     string;
-  locations:  { [locationId: string]: FingerprintDatapoint[] } = {};
-  locationNameMap : LocationNameMap = {};
-  sphereNameMap   : SphereNameMap = {};
-
-  constructor(sphereId: string, sphereName: string) {
-    super();
-    this.sphereId = sphereId;
-    this.locationNameMap[this.sphereId] = {};
-    this.sphereNameMap[this.sphereId] = sphereName;
-  }
-
-  getLocationNameMap() : LocationNameMap {
-    return this.locationNameMap;
-  }
-
-  getSphereNameMap() : SphereNameMap {
-    return this.sphereNameMap
-  }
-
-  loadDatapointForLocation(locationName: string, locationId : string, datapoint: FingerprintDatapoint | FingerprintDatapoint[], allowDuplicates = false) {
-    this.locationNameMap[this.sphereId][locationId] = locationName;
-
-    if (this.locations[locationId] === undefined) {
-      this.locations[locationId] = [];
-    }
-
-    // TODO: do not allow duplicates
-
-    if (Array.isArray(datapoint)) {
-      this.locations[locationId] = this.locations[locationId].concat(datapoint);
-    }
-    else {
-      this.locations[locationId].push(datapoint);
-    }
-  }
-
-  getLibData() : FingerprintLibFileFormat {
-    let result : FingerprintLibFileFormat = [];
-    for (let locationId in this.locations) {
-      result.push({
-        sphereId: this.sphereId,
-        locationId,
-        data: this.locations[locationId]
-      })
-    }
-
-    applySimulationConfig(result);
-    return result;
-  }
-}
+// export class FingerprintsBuilder extends FingerprintBase {
+//
+//   sphereId:     string;
+//   locations:  { [locationId: string]: FingerprintDatapoint[] } = {};
+//   locationNameMap : LocationNameMap = {};
+//   sphereNameMap   : SphereNameMap = {};
+//
+//   constructor(sphereId: string, sphereName: string) {
+//     super();
+//     this.sphereId = sphereId;
+//     this.locationNameMap[this.sphereId] = {};
+//     this.sphereNameMap[this.sphereId] = sphereName;
+//   }
+//
+//   getLocationNameMap() : LocationNameMap {
+//     return this.locationNameMap;
+//   }
+//
+//   getSphereNameMap() : SphereNameMap {
+//     return this.sphereNameMap
+//   }
+//
+//   loadDatapointForLocation(locationName: string, locationId : string, datapoint: FingerprintDatapoint | FingerprintDatapoint[], allowDuplicates = false) {
+//     this.locationNameMap[this.sphereId][locationId] = locationName;
+//
+//     if (this.locations[locationId] === undefined) {
+//       this.locations[locationId] = [];
+//     }
+//
+//     // TODO: do not allow duplicates
+//
+//     if (Array.isArray(datapoint)) {
+//       this.locations[locationId] = this.locations[locationId].concat(datapoint);
+//     }
+//     else {
+//       this.locations[locationId].push(datapoint);
+//     }
+//   }
+//
+//   getLibData() : FingerprintLibFileFormat {
+//     let result : FingerprintLibFileFormat = [];
+//     for (let locationId in this.locations) {
+//       result.push({
+//         sphereId: this.sphereId,
+//         locationId,
+//         data: this.locations[locationId]
+//       })
+//     }
+//
+//     // applySimulationConfig(result);
+//     return result;
+//   }
+// }
 
 export class Fingerprint extends FingerprintBase {
 
@@ -104,6 +104,7 @@ export class Fingerprint extends FingerprintBase {
   getAppData() : AppFingerprintFormat {
     if (this._data) { return this._data; }
     this._data = FileUtil.readJSON<AppFingerprintFormat>(this.path);
+    applySimulationConfig(this._data);
     return this._data;
   }
 
@@ -130,9 +131,7 @@ export class Fingerprint extends FingerprintBase {
   }
 
   getLibData() : FingerprintLibFileFormat {
-    let libData = DataMapper.AppFingerprintToLibs(this.getAppData());
-    applySimulationConfig(libData);
-    return libData;
+    return DataMapper.AppFingerprintToLibs(this.getAppData());
   }
 
   convertToDatasets() : Dataset[] {
@@ -207,50 +206,38 @@ function getDataset(sphereId: string, locationUid: string, datasets: Dataset[]) 
   throw new Error("Dataset not found.");
 }
 
-function applySimulationConfig(fingerprints: FingerprintLibFileFormat) {
+function applySimulationConfig(fingerprints: AppFingerprintFormat) {
   applyRssiThreshold(fingerprints);
-  if (SIMULATION_CONFIG.interpolation.fingerprint === true && SIMULATION_CONFIG.interpolation.type === "rssi") {
-    applyInterpolation(fingerprints);
-    applyDistanceConversion(fingerprints);
-  }
-  else if (SIMULATION_CONFIG.interpolation.fingerprint === true && SIMULATION_CONFIG.interpolation.type === "distance") {
-    applyDistanceConversion(fingerprints);
-    applyInterpolation(fingerprints);
-  }
-  else { // interpolation disabled.
-    applyDistanceConversion(fingerprints);
-  }
+  applyInterpolation(fingerprints);
 }
 
-function applyRssiThreshold(fingerprints: FingerprintLibFileFormat) {
+function applyRssiThreshold(fingerprints: AppFingerprintFormat) {
   if (SIMULATION_CONFIG.fingerprints.rssiUpperThreshold === -100) {
     return;
   }
 
-  for (let fingerprintSet of fingerprints) {
-    DataTransform.applyRssiThreshold(fingerprintSet.data, SIMULATION_CONFIG.fingerprints.rssiUpperThreshold);
-  }
-}
-
-function applyDistanceConversion(fingerprints: FingerprintLibFileFormat) {
-  if (SIMULATION_CONFIG.conversion.rssiToDistance === false) {
-    return;
-  }
-
-  for (let fingerprintSet of fingerprints) {
-    DataTransform.applyDistanceConversion(fingerprintSet.data);
+  for (let sphereId in fingerprints.spheres) {
+    let sphere = fingerprints.spheres[sphereId];
+    for (let locationId in sphere.fingerprints) {
+      let data = sphere.fingerprints[locationId].fingerprint;
+      DataTransform.applyRssiThreshold(data, SIMULATION_CONFIG.fingerprints.rssiUpperThreshold);
+    }
   }
 }
 
 
-function applyInterpolation(fingerprints: FingerprintLibFileFormat) {
+function applyInterpolation(fingerprints: AppFingerprintFormat) {
   if (SIMULATION_CONFIG.interpolation.fingerprint === false) {
     return;
   }
 
-
-  for (let fingerprintSet of fingerprints) {
-    DataTransform.applyInterpolation(fingerprintSet.data, true);
+  for (let sphereId in fingerprints.spheres) {
+    let sphere = fingerprints.spheres[sphereId];
+    for (let locationId in sphere.fingerprints) {
+      let data = sphere.fingerprints[locationId].fingerprint;
+      DataTransform.applyInterpolation(data, true);
+    }
   }
+
 }
 

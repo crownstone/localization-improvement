@@ -14,7 +14,7 @@ export class TestSet {
   scenarioName  : string;
 
   name          : string;
-  fingerprint   : FingerprintBase;
+  fingerprint   : Fingerprint;
   datasets      : Dataset[] = [];
 
   results          : {[datasetName: string] : OutputData } = {};
@@ -60,7 +60,7 @@ export class TestSet {
     }
   }
 
-  loadFingerprint(fingerprintPath: string | FingerprintBase) {
+  loadFingerprint(fingerprintPath: string | Fingerprint) {
     if (typeof fingerprintPath === "string") {
       this.fingerprint = new Fingerprint(fingerprintPath);
     }

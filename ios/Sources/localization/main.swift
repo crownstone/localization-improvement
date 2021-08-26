@@ -53,7 +53,7 @@ struct LocalizationSet: ParsableCommand {
         }
 
         knnClassifier.start()
-        
+        var count = 0
         for datapoint in datasetJSON {
             let data = datapoint.1
             let sphereId = data["sphereId"].stringValue
@@ -78,6 +78,8 @@ struct LocalizationSet: ParsableCommand {
                             "expectedLabel": data["label"].stringValue,
 //                            "distanceMap":   knnClassifier.getDistanceMap(sphereId) as Any
                         ])
+            
+            
         }
         
         

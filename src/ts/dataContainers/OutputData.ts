@@ -70,8 +70,8 @@ export class OutputData {
       title: "Classification distribution",
       width: width,
       height: height,
-      yaxis:{title:"Room classified"},
-      xaxis:{title:"Amount of classifications"},
+      xaxis:{title:"Room classified"},
+      yaxis:{title:"Number of classifications"},
       ...PLOT_MARGINS,
     }
 

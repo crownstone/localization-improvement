@@ -20,7 +20,7 @@ export class Runner {
     this.outputPathAnnotation = outputPathAnnotation;
   }
 
-  async start(overwrite: boolean = false, silent = true) : Promise<string[]> {
+  async start(overwrite: boolean = false, silent = false) : Promise<string[]> {
     let outputPaths = [];
     this.fingerprintRef.writeToTempFile()
     for (let dataset of this.datasetRefArray) {

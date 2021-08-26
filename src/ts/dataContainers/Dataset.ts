@@ -36,12 +36,12 @@ export class Dataset {
   getAppData() : AppDatasetFormat {
     if (this._data) { return this._data; }
     this.setData(FileUtil.readJSON<AppDatasetFormat>(this.path));
+    applySimulationConfig(this._data)
     return this._data;
   }
 
   getLibData() : DatasetFileLibFormat {
-    let converted = applySimulationConfig(this.getAppData());
-    let libData = DataMapper.AppDatasetToLibs(converted);
+    let libData = DataMapper.AppDatasetToLibs(this.getAppData());
     return libData
   }
 
@@ -61,9 +61,10 @@ export class Dataset {
   }
 
   plotSummary(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT, doPlot= true) {
-    this.plotDistanceReport(  width, height);
-    this.plotSampleSizeGraph( width, 0.5*height);
-    this.plotOffsetGraph(     width, 0.5*height);
+    this.plotDistanceReport(  width, height*1.75);
+    this.plotRssiOverview( width, height*1.75);
+    this.plotSampleSizeGraph( width, height);
+    this.plotOffsetGraph(     width, height);
 
     if (doPlot) {
       plot();
@@ -83,7 +84,7 @@ export class Dataset {
     plotData.push({y:result, name:`D=${distance}`})
 
     let layout : Layout = {
-      title: "Squared distance between sequantial samples (movement estimate) (D=5)",
+      title: "Squared distance between sequential samples (movement estimate) (D=5)",
       width: width,
       height: height,
       xaxis:{title:"samples"},
@@ -251,22 +252,8 @@ export function compareByDistance(set1 : FingerprintDatapoint[], set2: Fingerpri
 
 
 function applySimulationConfig(dataset: AppDatasetFormat) {
-  let convertedSet : AppDatasetFormat = Util.deepCopy(dataset)
-
-  applyRssiThreshold(convertedSet);
-  if (SIMULATION_CONFIG.interpolation.datasets === true && SIMULATION_CONFIG.interpolation.type === "rssi") {
-    applyInterpolation(convertedSet);
-    applyDistanceConversion(convertedSet);
-  }
-  else if (SIMULATION_CONFIG.interpolation.datasets === true && SIMULATION_CONFIG.interpolation.type === "distance") {
-    applyDistanceConversion(convertedSet);
-    applyInterpolation(convertedSet);
-  }
-  else { // interpolation disabled.
-    applyDistanceConversion(convertedSet);
-  }
-
-  return convertedSet;
+  applyRssiThreshold(dataset);
+  applyInterpolation(dataset);
 }
 
 function applyRssiThreshold(dataset: AppDatasetFormat) {
@@ -278,13 +265,6 @@ function applyRssiThreshold(dataset: AppDatasetFormat) {
 }
 
 
-function applyDistanceConversion(dataset: AppDatasetFormat) {
-  if (SIMULATION_CONFIG.conversion.rssiToDistance === false) {
-    return;
-  }
-
-  DataTransform.applyDistanceConversion(dataset.dataset)
-}
 
 
 function applyInterpolation(dataset: AppDatasetFormat) {

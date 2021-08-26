@@ -85,8 +85,8 @@ export class OutputDataAggregator {
         title: "Classification distribution",
         width: PLOT_DEFAULT_WIDTH,
         height: PLOT_DEFAULT_HEIGHT,
-        yaxis: {title: "Room classified"},
-        xaxis: {title: "Amount of classifications"},
+        yaxis: {title: "Number of classifications"},
+        xaxis: {title: "Room classified"},
         ...PLOT_MARGINS,
       }
 

@@ -1,5 +1,4 @@
 import {SIMULATION_CONFIG} from "../config";
-import {Util} from "./Util";
 
 export const DataTransform = {
 
@@ -13,23 +12,10 @@ export const DataTransform = {
     }
   },
 
-  applyDistanceConversion: function(dataContainer: FingerprintDatapoint[]) {
-    for (let datapoint of dataContainer) {
-      for (let deviceId in datapoint.devices) {
-        datapoint.devices[deviceId] = Math.min(
-          SIMULATION_CONFIG.conversion.maxDistanceMeters,
-          Math.max(
-            SIMULATION_CONFIG.conversion.minDistanceMeters,
-            Util.rssiToDistance(datapoint.devices[deviceId])
-          )
-        );
-      }
-    }
-  },
 
   applyInterpolation: function(dataContainer: FingerprintDatapoint[], allowForwardLookup: boolean) {
     let timeSearchThreshold = SIMULATION_CONFIG.interpolation.timespan;
-    for (let i = dataContainer.length - 1; i >= 0; i--) {
+    for (let i = dataContainer.length - 1; i >= 1; i--) {
       let previousPoint = dataContainer[i-1];
       let datapoint = dataContainer[i];
 
@@ -58,7 +44,7 @@ export function linearInterpolate(dataset: FingerprintDatapoint[], forIndex: num
   let value_min1 = dataset[forIndex-1].devices[deviceId];
   let value_plus1 = dataset[forIndex+1]?.devices[deviceId];
 
-  let t_plus1 = dataset[forIndex+1].timestamp ?? null;
+  let t_plus1 = dataset[forIndex+1]?.timestamp ?? null;
 
   // if we have a future point and it is within range, we can use that.
   if (allowForwardLookup && value_plus1 && t_plus1 - timestamp <= timeSearchThreshold) {
@@ -82,11 +68,10 @@ export function linearInterpolate(dataset: FingerprintDatapoint[], forIndex: num
     let dx = value_min1 - value_min2;
     let dt = t_min1 - t_min2;
     dataset[forIndex].devices[deviceId] = value_min1 + (dx/dt)*(timestamp - t_min1);
-
     // -60 - -70 = 10
     // -60 + 10 = -50
   }
-  else {
+  else if (SIMULATION_CONFIG.interpolation.require2points === false) {
     // copy
     dataset[forIndex].devices[deviceId] = value_min1;
   }
