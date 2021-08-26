@@ -94,7 +94,7 @@ export class OutputDataContainer {
   }
 }
 
-function getColor(type) {
+export function getColor(type) {
   switch (type) {
     case "naiveBayesian":
       return "#2c9aa8"

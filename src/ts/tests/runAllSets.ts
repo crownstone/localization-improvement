@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import {Collective} from "./dataContainers/Collective";
+import {Collective} from "../dataContainers/Collective";
 
 
 async function run() {

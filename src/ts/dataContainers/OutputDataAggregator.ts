@@ -1,6 +1,8 @@
 import {OutputData} from "./OutputData";
 import {OutputDataAggregatorContainer} from "./outputComponents/OutputDataAggregatorContainer";
 import {Util} from "../util/Util";
+import {Layout, stack} from "nodeplotlib";
+import {PLOT_DEFAULT_HEIGHT, PLOT_DEFAULT_WIDTH, PLOT_MARGINS} from "../config";
 
 export class OutputDataAggregator {
 
@@ -32,11 +34,68 @@ export class OutputDataAggregator {
   }
 
 
-  plotConfusionMatrix(sphereId) : boolean {
+  plotConfusionMatrix(sphereId: string) : boolean {
     let hasDatapoints = false;
     hasDatapoints = this.naiveBayesian.plotConfusionMatrixForSphere(sphereId, this.locationNameMap) || hasDatapoints;
     hasDatapoints = this.kNN.plotConfusionMatrixForSphere(sphereId, this.locationNameMap) || hasDatapoints;
     return hasDatapoints;
+  }
+
+  printTotalSuccessRate(sphereId: string) {
+    try {
+      console.log(`NaiveBayesian ${Math.round(100*this.naiveBayesian.getTotalSuccessRate(sphereId))}`)
+      console.log(`kNN           ${Math.round(100*this.kNN.getTotalSuccessRate(sphereId))}`)
+    }
+    catch (err) {
+      return false;
+    }
+    return true;
+  }
+
+
+  plotTotalSuccessRate(sphereId: string) : boolean {
+    try {
+      let data = [
+        this.naiveBayesian.getTotalSuccessRatePlot(sphereId),
+        this.kNN.getTotalSuccessRatePlot(sphereId)
+      ]
+      let layout: Layout = {
+        title: "Total Successrate",
+        width: PLOT_DEFAULT_WIDTH,
+        height: PLOT_DEFAULT_HEIGHT,
+        xaxis: {title: "Success percentage", range: [0, 100]},
+        ...PLOT_MARGINS,
+      }
+
+      stack(data, layout);
+    }
+    catch (err) {
+      return false;
+    }
+    return true;
+  }
+
+  plotSuccessRate(sphereId: string) : boolean {
+    try {
+      let data = [
+        this.naiveBayesian.getSuccessRateTrace(sphereId, this.locationNameMap),
+        this.kNN.getSuccessRateTrace(sphereId, this.locationNameMap),
+      ]
+      let layout: Layout = {
+        title: "Classification distribution",
+        width: PLOT_DEFAULT_WIDTH,
+        height: PLOT_DEFAULT_HEIGHT,
+        yaxis: {title: "Room classified"},
+        xaxis: {title: "Amount of classifications"},
+        ...PLOT_MARGINS,
+      }
+
+      stack(data, layout);
+    }
+    catch (err) {
+      return false;
+    }
+    return true;
   }
 }
 

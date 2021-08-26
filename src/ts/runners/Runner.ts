@@ -20,7 +20,7 @@ export class Runner {
     this.outputPathAnnotation = outputPathAnnotation;
   }
 
-  async start(overwrite: boolean = false) : Promise<string[]> {
+  async start(overwrite: boolean = false, silent = true) : Promise<string[]> {
     let outputPaths = [];
     this.fingerprintRef.writeToTempFile()
     for (let dataset of this.datasetRefArray) {
@@ -32,12 +32,12 @@ export class Runner {
       if (!alreadyExists || overwrite === true) {
         dataset.writeToTempFile();
         let start = Date.now();
-        console.log("Running iOS classifier with", this.fingerprintRef.name, "and", dataset.name, `(${dataset._data.dataset.length} points)`);
+        if (!silent) { console.log("Running iOS classifier with", this.fingerprintRef.name, "and", dataset.name, `(${dataset._data.dataset.length} points)`); }
         await runIOS(outputPath);
-        console.log("Completed. Took", (0.001*(Date.now() - start)).toFixed(3),'seconds.');
+        if (!silent) { console.log("Completed. Took", (0.001*(Date.now() - start)).toFixed(3),'seconds.'); }
       }
       else {
-        console.log("Skipping iOS classifier with", this.fingerprintRef.name, "and", dataset.name, "because: Already classified and overwrite is false");
+        if (!silent) { console.log("Skipping iOS classifier with", this.fingerprintRef.name, "and", dataset.name, "because: Already classified and overwrite is false"); }
       }
     }
     return outputPaths;

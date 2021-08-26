@@ -1,6 +1,6 @@
-import { plot, stack, clear, Plot, Layout } from 'nodeplotlib';
+import { stack, Plot, Layout } from 'nodeplotlib';
 import {Annotations, ColorScale} from "plotly.js";
-import {OutputDataContainer} from "./OutputDataContainer";
+import {getColor, OutputDataContainer} from "./OutputDataContainer";
 import {Util} from "../../util/Util";
 
 export class OutputDataAggregatorContainer {
@@ -141,6 +141,53 @@ export class OutputDataAggregatorContainer {
 
     stack(data, layout);
     return hasDatapoints;
+  }
+
+  getSuccessRate(sphereId, locationId) {
+    let sphere = this._data[sphereId];
+    if (!sphere) { throw "NO_SPHERE"; }
+
+    let sum = 0
+    for (let otherLocationId in sphere[locationId]) {
+      sum += sphere[locationId][otherLocationId];
+    }
+
+    if (sum === 0) {
+      return 0
+    }
+    return (sphere[locationId][locationId] || 0)/sum;
+  }
+
+  getTotalSuccessRate(sphereId: string) : number {
+    let sphere = this._data[sphereId];
+    if (!sphere) { throw "NO_SPHERE"; }
+
+    let avg = 0
+    for (let expectedId in sphere) {
+      avg += this.getSuccessRate(sphereId, expectedId);
+    }
+
+    return avg/Object.keys(sphere).length;
+  }
+
+  getTotalSuccessRatePlot(sphereId: string) : Plot {
+    const trace: Plot = {x: [Math.round(100*this.getTotalSuccessRate(sphereId))], type: 'bar', name:this.type, marker:{color: getColor(this.type)}};
+    return trace
+  }
+
+  getSuccessRateTrace(sphereId: string, locationNameMap: LocationNameMap) : Plot {
+    let sphere = this._data[sphereId];
+    if (!sphere) { throw "NO_SPHERE"; }
+
+    let x = [];
+    let y = [];
+
+    for (let expectedId in sphere) {
+      x.push(locationNameMap[sphereId][expectedId])
+      y.push((100*this.getSuccessRate(sphereId, expectedId)).toFixed(2));
+    }
+    const trace: Plot = {x: x, y: y, type: 'bar', name:this.type, marker:{color: getColor(this.type)}};
+    return trace;
   }
 
 }

@@ -1,4 +1,4 @@
-import {WebRtcServer} from "./rtc/WebRtcServer";
+import {WebRtcServer} from "../rtc/WebRtcServer";
 
 
 const connectionToken = "3fuehb-anw48GDAgniubrsj80ghbnfjdpj-fjwvrhbnlzvknkshno478";

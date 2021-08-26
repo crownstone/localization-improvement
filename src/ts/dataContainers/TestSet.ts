@@ -4,6 +4,9 @@ import {Runner} from "../runners/Runner";
 import {FileUtil} from "../util/FileUtil";
 import {OutputData} from "./OutputData";
 import {OutputDataAggregator} from "./OutputDataAggregator";
+import {SIMULATION_CONFIG} from "../config";
+var sha1 = require('sha1');
+
 
 export class TestSet {
 
@@ -99,7 +102,8 @@ export class TestSet {
   }
 
   _getOutputAnnotation() : string {
-    let annotation = `${this.userName}_${this.scenarioName}_${this.fingerprint.name.replace(".json",'')}`
+    let settingsHash = sha1(JSON.stringify(SIMULATION_CONFIG));
+    let annotation = `${this.userName}_${this.scenarioName}_${this.fingerprint.name.replace(".json",'')}_${settingsHash}`
     return annotation;
   }
 

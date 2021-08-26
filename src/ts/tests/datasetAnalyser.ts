@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import {FileUtil} from "./util/FileUtil";
+import {FileUtil} from "../util/FileUtil";
+import {plot} from "nodeplotlib";
 
 async function run() {
   let userName     = "Alex_de_Mulder"
@@ -19,14 +20,15 @@ async function run() {
 
 async function plotDatasets() {
   let sets = FileUtil.getDatasets();
-
   let i = 0
   for (let set of sets) {
     i++;
     if (i == 21) {
-      set.plotSummary(1300, 1000)
+
+      set.plotRssiOverview(1300, 1000,undefined, -80)
     }
   }
+  plot()
 
 }
 

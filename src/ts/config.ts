@@ -9,3 +9,12 @@ export const USER_PATH = path.join(__dirname,'/../../datasets/users');
 export const PLOT_MARGINS = {margin: {l: 150, r: 200, t: 100, b: 50}}
 export const PLOT_DEFAULT_WIDTH = 1500;
 export const PLOT_DEFAULT_HEIGHT = 400;
+
+export const SIMULATION_CONFIG = {
+  fingerprints: {
+    rssiUpperThreshold: -100,
+  },
+  datasets: {
+    rssiUpperThreshold: -100,
+  }
+}

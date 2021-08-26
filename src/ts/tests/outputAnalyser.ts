@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import {FileUtil} from "./util/FileUtil";
+import {FileUtil} from "../util/FileUtil";
 
 async function run() {
   let users = FileUtil.getUsers();

@@ -1,5 +1,5 @@
 import path from "path";
-import {PLOT_DEFAULT_HEIGHT, PLOT_DEFAULT_WIDTH, PLOT_MARGINS, TMP_DATASET_PATH} from "../config";
+import {PLOT_DEFAULT_HEIGHT, PLOT_DEFAULT_WIDTH, PLOT_MARGINS, SIMULATION_CONFIG, TMP_DATASET_PATH} from "../config";
 import {FileUtil} from "../util/FileUtil";
 import {DataMapper} from "../util/DataMappers";
 import {Layout, plot, Plot, stack} from "nodeplotlib";
@@ -26,7 +26,7 @@ export class Dataset {
   setData(data: AppDatasetFormat) {
     this._data = data;
     this.locationName = this._data?.location?.name  || "UNKNOWN"
-    this.locationUid   = this._data?.location?.uid   || "UNKNOWN"
+    this.locationUid  = this._data?.location?.uid   || "UNKNOWN"
     this.sphereName   = this._data?.sphere?.name    || "UNKNOWN"
     this.sphereId     = this._data?.sphere?.cloudId || "UNKNOWN"
   }
@@ -38,7 +38,9 @@ export class Dataset {
   }
 
   getLibData() : DatasetFileLibFormat {
-    return DataMapper.AppDatasetToLibs(this.getAppData());
+    let libData = DataMapper.AppDatasetToLibs(this.getAppData());
+    applyRssiThreshold(libData);
+    return libData
   }
 
   writeToTempFile(tmpFilePath = TMP_DATASET_PATH) {
@@ -127,8 +129,61 @@ export class Dataset {
     stack([plotData], layout);
   }
 
+  plotRssiOverview(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT, title = undefined, limit: number = -100) {
+    let data = this.getAppData();
 
+    let results = []
+    let labelsY = [];
 
+    let deviceIds = {};
+    for (let i = 0; i < data.dataset.length; i++) {
+      let item = data.dataset[i];
+      labelsY.push(i)
+      for (let deviceId in item.devices) {
+        deviceIds[deviceId] = true;
+      }
+    }
+
+    let deviceIdArray = Object.keys(deviceIds);
+
+    let labelsX = deviceIdArray.map((a) => a.split("_Maj:")[1]);
+
+    for (let i = 0; i < data.dataset.length; i++) {
+      results.push(new Array(deviceIdArray.length))
+    }
+
+    for (let i = 0; i < data.dataset.length; i++) {
+      for (let j = 0; j < deviceIdArray.length; j++) {
+        let value = data.dataset[i].devices[deviceIdArray[j]];
+        if (value <= limit) { value = -100 }
+        results[i][j] = value;
+      }
+    }
+
+    let plotData : Plot = {
+      x: labelsX,
+      y: labelsY,
+      z: results,
+      type: 'heatmap',
+      colorscale: [
+        [0.0, "#c800ff"],
+        [0.000001, "#00172c"],
+        [0.49, "#b1eb76"],
+        [1.0, "#ff0000"]
+      ]
+    };
+
+    let layout : Layout = {
+      title: title || `Rssi distribution per sample`,
+      width: width,
+      height: height,
+      xaxis:{title:"Crownstones"},
+      yaxis:{title:"samples"},
+      margin: {l: 150, r: 200, t: 100, b: 150},
+    }
+
+    stack([plotData], layout);
+  }
 }
 
 function getDistance(a : FingerprintDatapoint, b: FingerprintDatapoint) {
@@ -190,4 +245,18 @@ export function compareByDistance(set1 : FingerprintDatapoint[], set2: Fingerpri
 
 
   return [plotData, stepSize]
+}
+
+function applyRssiThreshold(dataset: DatasetFileLibFormat) {
+  if (SIMULATION_CONFIG.datasets.rssiUpperThreshold === -100) {
+    return;
+  }
+
+  for (let item of dataset) {
+    for (let i = item.in.length - 1; i >= 0; i--) {
+      if (item.in[i][1] < SIMULATION_CONFIG.fingerprints.rssiUpperThreshold) {
+        item.in.splice(i,1);
+      }
+    }
+  }
 }

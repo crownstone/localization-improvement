@@ -1,6 +1,12 @@
 import path from "path";
 import {compareByDistance, Dataset} from "./Dataset";
-import {PLOT_DEFAULT_HEIGHT, PLOT_DEFAULT_WIDTH, PLOT_MARGINS, TMP_FINGERPRINT_PATH} from "../config";
+import {
+  PLOT_DEFAULT_HEIGHT,
+  PLOT_DEFAULT_WIDTH,
+  PLOT_MARGINS,
+  SIMULATION_CONFIG,
+  TMP_FINGERPRINT_PATH
+} from "../config";
 import {FileUtil} from "../util/FileUtil";
 import {DataMapper} from "../util/DataMappers";
 import {Layout, plot, stack} from "nodeplotlib";
@@ -76,6 +82,8 @@ export class FingerprintsBuilder extends FingerprintBase {
         data: this.locations[locationId]
       })
     }
+
+    applyRssiThreshold(result);
     return result;
   }
 }
@@ -120,7 +128,9 @@ export class Fingerprint extends FingerprintBase {
   }
 
   getLibData() : FingerprintLibFileFormat {
-    return DataMapper.AppFingerprintToLibs(this.getAppData());
+    let libData = DataMapper.AppFingerprintToLibs(this.getAppData());
+    applyRssiThreshold(libData);
+    return libData;
   }
 
   convertToDatasets() : Dataset[] {
@@ -134,10 +144,11 @@ export class Fingerprint extends FingerprintBase {
     return result;
   }
 
-  plotSummary(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
+  plotSummary(rssiThreshold: number = -100, width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
     let datasets = this.convertToDatasets();
     for (let dataset of datasets) {
-      dataset.plotDistanceReport(width, height, `${dataset.sphereName}:${dataset.locationName}`);
+      dataset.plotDistanceReport(width, height*1.75, `${dataset.sphereName}:${dataset.locationName} distance`);
+      dataset.plotRssiOverview(width, height*1.75, `${dataset.sphereName}:${dataset.locationName} rssi distribution`, rssiThreshold);
     }
     plot()
   }
@@ -169,7 +180,7 @@ export class Fingerprint extends FingerprintBase {
       ...PLOT_MARGINS,
     }
 
-    stack([plotData2], layout);
+    stack([plotData2], layout2);
     plot()
   }
 
@@ -192,4 +203,20 @@ function getDataset(sphereId: string, locationUid: string, datasets: Dataset[]) 
     }
   }
   throw new Error("Dataset not found.");
+}
+
+function applyRssiThreshold(fingerprints: FingerprintLibFileFormat) {
+  if (SIMULATION_CONFIG.fingerprints.rssiUpperThreshold === -100) {
+    return;
+  }
+
+  for (let fingerprintSet of fingerprints) {
+    for (let datapoint of fingerprintSet.data) {
+      for (let deviceId in datapoint.devices) {
+        if (datapoint.devices[deviceId] < SIMULATION_CONFIG.fingerprints.rssiUpperThreshold) {
+          delete datapoint.devices[deviceId];
+        }
+      }
+    }
+  }
 }

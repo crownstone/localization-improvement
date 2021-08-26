@@ -8,7 +8,7 @@ export class Scenario {
 
   name         : string;
   path         : string;
-  sets         : TestSet[] = []
+  sets         : {[fingerprintName: string]: TestSet};
 
   constructor(scenarioPath: string, userName: string = "UNKNOWN") {
     this.userName = userName;
@@ -18,16 +18,16 @@ export class Scenario {
     let fingerprintFiles = FileUtil.getJSONFilePaths(path.join(scenarioPath, 'fingerprints'));
 
     for (let fingerprintPath of fingerprintFiles) {
-      this.sets.push(new TestSet(scenarioPath, fingerprintPath, this.name, this.userName));
+      let set = new TestSet(scenarioPath, fingerprintPath, this.name, this.userName);
+      this.sets[set.fingerprint.name] = set;
     }
   }
 
   getSet(fingerprintName: string) : TestSet {
-    for (let set of this.sets) {
-      if (set.name === fingerprintName) {
-        return set;
-      }
+    if (this.sets[fingerprintName]) {
+      return this.sets[fingerprintName];
     }
+
     throw new Error("Fingerprint not found.");
   }
 }

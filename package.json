@@ -6,13 +6,15 @@
   "scripts": {
     "start": "tsc --watch",
     "build": "tsc",
-    "server": "node ./src/js/receiveFiles"
+    "server": "node ./src/js/bin/receiveFiles",
+    "getMap": "node ./src/js/bin/getProcessingMap"
   },
   "author": "Alex",
   "dependencies": {
     "nodeplotlib": "^0.7.5",
     "peerjs-on-node": "^1.0.2",
-    "wrtc": "^0.4.7"
+    "wrtc": "^0.4.7",
+    "sha1": "^1.1.1"
   },
   "devDependencies": {
     "@types/jest": "^26.0.7",
