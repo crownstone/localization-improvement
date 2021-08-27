@@ -1,7 +1,7 @@
-import {Collective} from "../dataContainers/Collective";
-import {tSNE} from "../logic/tsne";
+import {Collective} from "../../dataContainers/Collective";
+import {tSNE} from "../../logic/tsne";
 import {Plot, plot} from "nodeplotlib";
-import {Mixer} from "../util/colorCharm/Mixer";
+import {Mixer} from "../../util/colorCharm/Mixer";
 
 
 let processingMap = {
@@ -73,7 +73,7 @@ let colors = colorMixer.linear(
 ).toHex()
 
 
-let tsneFingerprints = new tSNE();
+let tsneFingerprints = new tSNE({dimension:3});
 
 tsneFingerprints.initDataRaw(data);
 
@@ -85,18 +85,27 @@ let layout = {
 function plotIt() {
   let Y = tsneFingerprints.getSolution(); // Y is an array of 2-D points that you can plot
   let traces : Plot[] = [];
-  let x = []
+  let x = [];
   let y = [];
+  let z = [];
   let colorIndex = 0
   let currentLabel = labelArray[0]
 
   function draw(i) {
     if (labelArray[i] !== currentLabel) {
       traces.push({
-        x, y, name: currentLabel, mode: 'markers',
+        x, y, z, name: currentLabel, mode: 'markers',
         marker:{
-          color: colors[colorIndex%labelCount], symbol: colorIndex % 2 === 0 ? "x" : "."
-        },type: "scatter"});
+          color: colors[colorIndex%labelCount],
+          // line: {
+          //   color: 'rgba(217, 217, 217, 0.14)',
+          //   width: 0.5
+          // },
+          opacity: 0.8,
+          // symbol: colorIndex % 2 === 0 ? "x" : "."
+        },
+        type: "scatter3d"
+      });
       x = [];
       y = [];
       currentLabel = labelArray[i]
@@ -107,6 +116,7 @@ function plotIt() {
     draw(i)
     x.push(Y[i][0])
     y.push(Y[i][1])
+    z.push(Y[i][2])
   }
   draw(0)
 
@@ -115,7 +125,7 @@ function plotIt() {
 }
 
 
-for(let i = 0; i < 5000; i++) {
+for(let i = 0; i < 2000; i++) {
   tsneFingerprints.step(); // every time you call this, solution gets better
   if (i % 25 == 0) {
     console.log("Iter: ", i)

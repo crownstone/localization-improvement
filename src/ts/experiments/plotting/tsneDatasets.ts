@@ -1,7 +1,7 @@
-import {Collective} from "../dataContainers/Collective";
-import {tSNE} from "../logic/tsne";
+import {Collective} from "../../dataContainers/Collective";
+import {tSNE} from "../../logic/tsne";
 import {Plot, plot} from "nodeplotlib";
-import {Mixer} from "../util/colorCharm/Mixer";
+import {Mixer} from "../../util/colorCharm/Mixer";
 
 const STEP_SIZE = 3
 const ITERATIONS = 2000
