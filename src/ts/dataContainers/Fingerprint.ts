@@ -208,6 +208,7 @@ function getDataset(sphereId: string, locationUid: string, datasets: Dataset[]) 
 
 function applySimulationConfig(fingerprints: AppFingerprintFormat) {
   applyRssiThreshold(fingerprints);
+  applyDistanceConversion(fingerprints);
   applyInterpolation(fingerprints);
 }
 
@@ -221,6 +222,21 @@ function applyRssiThreshold(fingerprints: AppFingerprintFormat) {
     for (let locationId in sphere.fingerprints) {
       let data = sphere.fingerprints[locationId].fingerprint;
       DataTransform.applyRssiThreshold(data, SIMULATION_CONFIG.fingerprints.rssiUpperThreshold);
+    }
+  }
+}
+
+function applyDistanceConversion(fingerprints: AppFingerprintFormat) {
+  if (SIMULATION_CONFIG.conversion.rssiToDistance === false) {
+    return;
+  }
+
+
+  for (let sphereId in fingerprints.spheres) {
+    let sphere = fingerprints.spheres[sphereId];
+    for (let locationId in sphere.fingerprints) {
+      let data = sphere.fingerprints[locationId].fingerprint;
+      DataTransform.applyDistanceConversion(data);
     }
   }
 }

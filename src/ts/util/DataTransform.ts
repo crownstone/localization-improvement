@@ -1,4 +1,5 @@
 import {SIMULATION_CONFIG} from "../config";
+import {Util} from "./Util";
 
 export const DataTransform = {
 
@@ -12,6 +13,19 @@ export const DataTransform = {
     }
   },
 
+  applyDistanceConversion: function(dataContainer: FingerprintDatapoint[]) {
+    for (let datapoint of dataContainer) {
+      for (let deviceId in datapoint.devices) {
+        datapoint.devices[deviceId] = Math.min(
+          SIMULATION_CONFIG.conversion.maxDistanceMeters,
+          Math.max(
+            SIMULATION_CONFIG.conversion.minDistanceMeters,
+            Util.rssiToDistance(datapoint.devices[deviceId])
+          )
+        );
+      }
+    }
+  },
 
   applyInterpolation: function(dataContainer: FingerprintDatapoint[], allowForwardLookup: boolean) {
     let timeSearchThreshold = SIMULATION_CONFIG.interpolation.timespan;

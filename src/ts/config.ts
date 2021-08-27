@@ -17,6 +17,11 @@ export const SIMULATION_CONFIG = {
   datasets: {
     rssiUpperThreshold: -100,
   },
+  conversion: {
+    rssiToDistance: true,
+    minDistanceMeters: 0.75, // about -50
+    maxDistanceMeters: 7.5   // about -90
+  },
   interpolation: {
     fingerprint:    false,
     datasets:       false,

@@ -153,6 +153,13 @@ export const Util = {
     return true;
   },
 
+  rssiToDistance: function(rssi: number) : number {
+    let N_VALUE = 4.0;
+    let CALIBRATION_VALUE = -55;
+    let distance = Math.pow(10,(rssi - CALIBRATION_VALUE)/(-10 * N_VALUE));
+    return distance;
+  }
+
 }
 
 const S4 = function () {

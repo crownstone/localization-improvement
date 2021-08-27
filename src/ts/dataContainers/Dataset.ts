@@ -3,7 +3,6 @@ import {PLOT_DEFAULT_HEIGHT, PLOT_DEFAULT_WIDTH, PLOT_MARGINS, SIMULATION_CONFIG
 import {FileUtil} from "../util/FileUtil";
 import {DataMapper} from "../util/DataMappers";
 import {Layout, plot, Plot, stack} from "nodeplotlib";
-import {Util} from "../util/Util";
 import {DataTransform} from "../util/DataTransform";
 
 export class Dataset {
@@ -253,6 +252,7 @@ export function compareByDistance(set1 : FingerprintDatapoint[], set2: Fingerpri
 
 function applySimulationConfig(dataset: AppDatasetFormat) {
   applyRssiThreshold(dataset);
+  applyDistanceConversion(dataset);
   applyInterpolation(dataset);
 }
 
@@ -265,6 +265,13 @@ function applyRssiThreshold(dataset: AppDatasetFormat) {
 }
 
 
+function applyDistanceConversion(dataset: AppDatasetFormat) {
+  if (SIMULATION_CONFIG.conversion.rssiToDistance === false) {
+    return;
+  }
+
+  DataTransform.applyDistanceConversion(dataset.dataset)
+}
 
 
 function applyInterpolation(dataset: AppDatasetFormat) {
