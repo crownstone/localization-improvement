@@ -1,8 +1,10 @@
 import path from "path";
 
-export const TMP_FINGERPRINT_PATH = path.join(__dirname,'/../../tmp/Fingerprint.json');
-export const TMP_DATASET_PATH     = path.join(__dirname,'/../../tmp/Dataset.json');
-export const TMP_OUTPUT_PATH_BASE = path.join(__dirname,'/../../tmp/');
+export const TMP_FINGERPRINT_PATH  = path.join(__dirname,'/../../tmp/Fingerprint.json');
+export const TMP_DATASET_PATH      = path.join(__dirname,'/../../tmp/Dataset.json');
+export const TMP_OUTPUT_PATH_BASE  = path.join(__dirname,'/../../tmp/');
+export const WEKA_FINGERPRINT_PATH = path.join(__dirname,'/../../weka/training-sets/');
+export const WEKA_DATASET_PATH     = path.join(__dirname,'/../../weka/test-sets/');
 
 export const USER_PATH = path.join(__dirname,'/../../datasets/users');
 

@@ -62,8 +62,8 @@ for (let dataset of datasets) {
     for (let deviceId in allCrownstones) {
       dataArray.push(point.devices[deviceId] ?? NO_DATA);
     }
-    labelArray.push(`${dataset.locationUid}:${dataset.locationName}`);
-    labelMap[`${dataset.locationUid}:${dataset.locationName}`] = true
+    labelArray.push(`${dataset.locationId}:${dataset.locationName}`);
+    labelMap[`${dataset.locationId}:${dataset.locationName}`] = true
     data.push(dataArray)
   }
 }

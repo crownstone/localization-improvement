@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-import {FileUtil} from "../util/FileUtil";
-import {plot} from "nodeplotlib";
 import {Collective} from "../dataContainers/Collective";
 
 

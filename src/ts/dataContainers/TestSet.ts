@@ -4,7 +4,9 @@ import {Runner} from "../runners/Runner";
 import {FileUtil} from "../util/FileUtil";
 import {OutputData} from "./OutputData";
 import {OutputDataAggregator} from "./OutputDataAggregator";
-import {SIMULATION_CONFIG} from "../config";
+import {SIMULATION_CONFIG, WEKA_DATASET_PATH, WEKA_FINGERPRINT_PATH} from "../config";
+import {Util} from "../util/Util";
+import {DataMapper} from "../util/DataMappers";
 var sha1 = require('sha1');
 
 
@@ -13,7 +15,6 @@ export class TestSet {
   userName      : string;
   scenarioName  : string;
 
-  name          : string;
   fingerprint   : Fingerprint;
   datasets      : Dataset[] = [];
 
@@ -67,8 +68,6 @@ export class TestSet {
     else {
       this.fingerprint = fingerprintPath;
     }
-
-    this.name = this.fingerprint.name;
   }
 
   _getLocationNameMap() : LocationNameMap {
@@ -140,6 +139,44 @@ export class TestSet {
   aggregate() {
     for (let datasetName in this.results) {
       this.aggregatedResult.add(this.results[datasetName])
+    }
+  }
+
+  generateWekaFiles() {
+    if (this.datasets.length === 0) {
+      throw "No datasets to work with."
+    }
+
+    let sphereIds = {}
+    for (let dataset of this.datasets) {
+      dataset.getAppData();
+      sphereIds[dataset.sphereId] = true;
+    }
+
+    for (let sphereId in sphereIds) {
+      let locationNameMap = this.fingerprint.getLocationNameMap();
+      let locationNames = DataMapper.getLocationLabels(sphereId, locationNameMap);
+
+      // generate a Crownstone map that covers all obeserved Crownstones in the testset.
+      let crownstoneMap = this.fingerprint.getCrownstoneMap(sphereId);
+      for (let dataset of this.datasets) {
+        Util.deepExtend(crownstoneMap, dataset.getCrownstoneMap())
+      }
+
+      DataMapper.FingerprintToWeka(sphereId, this.fingerprint, crownstoneMap, locationNames)
+        .store(WEKA_FINGERPRINT_PATH + `${sphereId}_${this.fingerprint.name}.arff`);
+
+      let arff = null;
+      for (let dataset of this.datasets) {
+        let newArff = DataMapper.DatasetToWeka(dataset, this.fingerprint, crownstoneMap, locationNames);
+        if (arff === null) {
+          arff = newArff
+        } else {
+          arff.join(newArff);
+        }
+      }
+
+      arff.store(WEKA_DATASET_PATH + `${sphereId}_${this.scenarioName}.arff`);
     }
   }
 

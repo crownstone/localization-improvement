@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import {FileUtil} from "../util/FileUtil";
+import {Fingerprint} from "../dataContainers/Fingerprint";
 
-
+//
 async function plotFingerprint() {
   let sets = FileUtil.getFingerprints();
   let fingerprint = sets[0];
@@ -11,4 +12,3 @@ async function plotFingerprint() {
 }
 
 plotFingerprint()
-

@@ -11,6 +11,10 @@ interface LocationNameMap {
   }
 }
 
+interface CrownstoneMap {
+  [crownstoneIbeaconId: string]: boolean
+}
+
 interface SphereNameMap {
   [sphereId: string]: string
 }

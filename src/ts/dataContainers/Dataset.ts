@@ -13,7 +13,7 @@ export class Dataset {
   sphereId     : string = null;
   sphereName   : string = null;
   locationName : string = null;
-  locationUid  : string = null;
+  locationId  : string = null;
 
   _data        : AppDatasetFormat;
 
@@ -27,9 +27,20 @@ export class Dataset {
   setData(data: AppDatasetFormat) {
     this._data = data;
     this.locationName = this._data?.location?.name  || "UNKNOWN"
-    this.locationUid  = this._data?.location?.uid   || "UNKNOWN"
+    this.locationId   = this._data?.location?.uid   || "UNKNOWN"
     this.sphereName   = this._data?.sphere?.name    || "UNKNOWN"
     this.sphereId     = this._data?.sphere?.cloudId || "UNKNOWN"
+  }
+
+  getCrownstoneMap() : CrownstoneMap {
+    this.getAppData();
+    let allCrownstones = {}
+    for (let datapoint of this._data.dataset) {
+      for (let deviceId in datapoint.devices) {
+        allCrownstones[deviceId] = true;
+      }
+    }
+    return allCrownstones;
   }
 
   getAppData() : AppDatasetFormat {

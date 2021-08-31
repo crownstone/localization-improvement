@@ -4,7 +4,7 @@ import {
   PLOT_DEFAULT_HEIGHT,
   PLOT_DEFAULT_WIDTH,
   PLOT_MARGINS,
-  SIMULATION_CONFIG,
+  SIMULATION_CONFIG, TMP_DATASET_PATH,
   TMP_FINGERPRINT_PATH
 } from "../config";
 import {FileUtil} from "../util/FileUtil";
@@ -108,6 +108,21 @@ export class Fingerprint extends FingerprintBase {
     return this._data;
   }
 
+  getCrownstoneMap(sphereId: string) : CrownstoneMap {
+    this.getAppData();
+    let allCrownstones = {}
+    console.log(sphereId)
+    let fingerprints = this._data.spheres[sphereId].fingerprints
+    for (let locationId in fingerprints) {
+      for (let datapoint of fingerprints[locationId].fingerprint) {
+        for (let deviceId in datapoint.devices) {
+          allCrownstones[deviceId] = true;
+        }
+      }
+    }
+    return allCrownstones;
+  }
+
   getLocationNameMap() : LocationNameMap {
     this.getAppData();
     let result = {};
@@ -121,6 +136,7 @@ export class Fingerprint extends FingerprintBase {
     return result;
   }
 
+
   getSphereNameMap() : SphereNameMap {
     this.getAppData();
     let result = {};
@@ -130,9 +146,11 @@ export class Fingerprint extends FingerprintBase {
     return result;
   }
 
+
   getLibData() : FingerprintLibFileFormat {
     return DataMapper.AppFingerprintToLibs(this.getAppData());
   }
+
 
   convertToDatasets() : Dataset[] {
     let datasets = DataMapper.AppFingerprintToAppDatasets(this.getAppData());
@@ -145,6 +163,7 @@ export class Fingerprint extends FingerprintBase {
     return result;
   }
 
+
   plotSummary(rssiThreshold: number = -100, width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
     let datasets = this.convertToDatasets();
     for (let dataset of datasets) {
@@ -153,6 +172,7 @@ export class Fingerprint extends FingerprintBase {
     }
     plot()
   }
+
 
   compareLocations(sphereId : string, locationUid1: string | number, locationUid2: string | number, width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
     let datasets = this.convertToDatasets()
@@ -199,7 +219,7 @@ function getDataset(sphereId: string, locationUid: string, datasets: Dataset[]) 
       set.getAppData();
     }
 
-    if (set.sphereId === sphereId && locationUid === set.locationUid) {
+    if (set.sphereId === sphereId && locationUid === set.locationId) {
       return set;
     }
   }
