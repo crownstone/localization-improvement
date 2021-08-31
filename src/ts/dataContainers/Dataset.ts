@@ -114,7 +114,7 @@ export class Dataset {
     stack([{y:result}], layout);
   }
 
-  plotDistanceReport(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT, title = undefined) {
+  plotDistanceReport(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT*2, title = undefined) {
     let data = this.getAppData();
 
     let [plotData, stepSize] = compareByDistance(data.dataset, data.dataset);
@@ -131,7 +131,7 @@ export class Dataset {
     stack([plotData], layout);
   }
 
-  plotRssiOverview(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT, title = undefined, limit: number = -100) {
+  plotRssiOverview(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT*2, title = undefined, limit: number = -100) {
     let data = this.getAppData();
 
     let results = []
@@ -251,9 +251,9 @@ export function compareByDistance(set1 : FingerprintDatapoint[], set2: Fingerpri
 
 
 function applySimulationConfig(dataset: AppDatasetFormat) {
+  applyInterpolation(dataset);
   applyRssiThreshold(dataset);
   applyDistanceConversion(dataset);
-  applyInterpolation(dataset);
 }
 
 function applyRssiThreshold(dataset: AppDatasetFormat) {

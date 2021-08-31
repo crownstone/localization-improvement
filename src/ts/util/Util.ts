@@ -158,6 +158,13 @@ export const Util = {
     let CALIBRATION_VALUE = -55;
     let distance = Math.pow(10,(rssi - CALIBRATION_VALUE)/(-10 * N_VALUE));
     return distance;
+  },
+
+
+  mapMerge(map: {[item: string]: any}, keyArray: string[], value: any = true) {
+    for (let item of keyArray) {
+      map[item] = value;
+    }
   }
 
 }

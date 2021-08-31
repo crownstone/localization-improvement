@@ -18,7 +18,7 @@ export class TestSet {
   datasets      : Dataset[] = [];
 
   results          : {[datasetName: string] : OutputData } = {};
-  aggregatedResult : OutputDataAggregator;
+  aggregatedResult : OutputDataAggregator = null;
 
   constructor(scenarioPath?: string, fingerprintPath?: string, scenarioName: string = "UnknownScenario", userName: string = "UnknownUser") {
     this.userName = userName;
@@ -69,7 +69,6 @@ export class TestSet {
     }
 
     this.name = this.fingerprint.name;
-    this.aggregatedResult = new OutputDataAggregator(this._getLocationNameMap());
   }
 
   _getLocationNameMap() : LocationNameMap {
@@ -86,6 +85,8 @@ export class TestSet {
   }
 
   async run(datasetName: string | Dataset, overwrite = false) : Promise<OutputData> {
+    this._ensureAggregator()
+
     let dataset;
     if (typeof datasetName === 'string') {
       dataset = this._getDatasetByName(datasetName);
@@ -109,6 +110,8 @@ export class TestSet {
 
 
   async runAll(overwrite = false) : Promise<OutputData[]> {
+    this._ensureAggregator()
+
     let runner = new Runner(this.fingerprint, this.datasets, this._getOutputAnnotation());
     let outputPaths = await runner.start(overwrite);
 
@@ -123,6 +126,12 @@ export class TestSet {
     return Object.values(this.results);
   }
 
+
+  _ensureAggregator() {
+    if (this.aggregatedResult === null) {
+      this.aggregatedResult = new OutputDataAggregator(this._getLocationNameMap());
+    }
+  }
 
   clearAggregatedResults() {
     this.aggregatedResult.clear();

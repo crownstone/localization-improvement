@@ -93,6 +93,8 @@ It also contains a number of analysis plot methods.
   ![distance_graph](./images/distance_graph.png)
 - It can plot an SampleSizeGraph which shows the how many Crownstones are in each sample. Not every Crownstone is in every input vector due to either timing, bad luck or signal blockage by the real world and the user.
    ![sample_size_graph](./images/sample_size_graph.png)
+- It can plot a RSSI distribution where you can see per vector which Crownstones are in it and what their RSSI values are. Pink is lowest value.
+   ![rssiDistribution](./images/rssiDistribution.png)
 
 
 ### Fingerprint

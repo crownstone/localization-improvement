@@ -18,14 +18,15 @@ export const SIMULATION_CONFIG = {
     rssiUpperThreshold: -100,
   },
   conversion: {
-    rssiToDistance: true,
+    rssiToDistance: false,
     minDistanceMeters: 0.75, // about -50
     maxDistanceMeters: 7.5   // about -90
   },
   interpolation: {
-    fingerprint:    false,
-    datasets:       false,
-    require2points: false,
-    timespan:       2, // two seconds to look in front and/or behind.
+    fingerprint:     false,
+    datasets:        false,
+    require2points:  false,
+    rssiThreshold:   -90,
+    timespanSeconds: 3, // N seconds to look in front and/or behind.
   }
 }

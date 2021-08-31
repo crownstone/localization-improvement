@@ -166,7 +166,7 @@ export class Collective {
     }
   }
 
-  async runSets(overwrite= false) {
+  async runSets(overwrite = false) {
     for (let set of this.testSets) {
       await set.runAll(overwrite);
       this.aggregatedResult.merge(set.aggregatedResult);
