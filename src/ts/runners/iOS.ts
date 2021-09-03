@@ -1,23 +1,9 @@
-import {exec} from "child_process";
 import {TMP_DATASET_PATH, TMP_FINGERPRINT_PATH} from "../config";
+import {run} from "./runnerUtil";
+import path from "path";
 
-const packagePath = `${__dirname}/../../../ios`
+const packagePath = path.join(__dirname,'/../../../ios');
 
 export async function runIOS(outputPath, silent = false) : Promise<void> {
-  return new Promise((resolve, reject) => {
-    const callback = function (error, stdout, stderr) {
-      if (error) {
-        console.log(error.stack);
-        console.log('Error code: '+error.code);
-        console.log('Signal received: '+error.signal);
-      }
-      if (silent === false) {
-        console.log('Child Process STDERR: ' + stderr);
-        console.log('Child Process STDOUT: ' + stdout);
-      }
-      resolve();
-    };
-
-    exec(`swift run localization "${TMP_FINGERPRINT_PATH}" "${TMP_DATASET_PATH}" "${outputPath}" --package-path "${packagePath}"`, callback);
-  })
+  return run(`swift run localization "${TMP_FINGERPRINT_PATH}" "${TMP_DATASET_PATH}" "${outputPath}" --package-path "${packagePath}"`, silent)
 }

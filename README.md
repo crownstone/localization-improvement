@@ -166,3 +166,13 @@ Each time the localization datasets are sent, the fingerprints on the phone are 
 to the dataset folder once it is new. This is per user, per scenario.
 
 Scenario data is not contained in the RTC traffic and has to be taken care of my the receiver. This is done by changing the activeScenario.json.
+
+
+# Weka
+
+To use auto-weka, you have to checkout the following repo
+```
+git clone https://github.com/automl/autoweka
+```
+
+If you don't clone it into this repo, you have to update the config to point to the autoweka jar file.

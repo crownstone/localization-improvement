@@ -6,6 +6,9 @@ export const TMP_OUTPUT_PATH_BASE  = path.join(__dirname,'/../../tmp/');
 export const WEKA_FINGERPRINT_PATH = path.join(__dirname,'/../../weka/training-sets/');
 export const WEKA_DATASET_PATH     = path.join(__dirname,'/../../weka/test-sets/');
 
+export const WEKA_JAR_PATH         = path.join(__dirname,'/../lib/weka.jar');
+export const AUTO_WEKA_JAR_PATH    = path.join(__dirname,'/../../autoweka/autoweka.jar');
+
 export const USER_PATH = path.join(__dirname,'/../../datasets/users');
 
 export const PLOT_MARGINS = {margin: {l: 150, r: 200, t: 100, b: 50}}
