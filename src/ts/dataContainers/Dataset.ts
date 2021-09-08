@@ -4,6 +4,7 @@ import {FileUtil} from "../util/FileUtil";
 import {DataMapper} from "../util/DataMappers";
 import {Layout, plot, Plot, stack} from "nodeplotlib";
 import {DataTransform} from "../util/DataTransform";
+import {getDistance} from "../util/Util";
 
 export class Dataset {
 
@@ -24,12 +25,20 @@ export class Dataset {
     }
   }
 
+  /**
+   * Syntax sugar. getAppdata sets all the fields in this class so it is sort of an initialize call.
+   */
+  initialize() {
+    this.getAppData();
+  }
+
   setData(data: AppDatasetFormat) {
     this._data = data;
     this.locationName = this._data?.location?.name  || "UNKNOWN"
     this.locationId   = this._data?.location?.uid   || "UNKNOWN"
     this.sphereName   = this._data?.sphere?.name    || "UNKNOWN"
     this.sphereId     = this._data?.sphere?.cloudId || "UNKNOWN"
+    applySimulationConfig(this._data)
   }
 
   getCrownstoneMap() : CrownstoneMap {
@@ -46,7 +55,6 @@ export class Dataset {
   getAppData() : AppDatasetFormat {
     if (this._data) { return this._data; }
     this.setData(FileUtil.readJSON<AppDatasetFormat>(this.path));
-    applySimulationConfig(this._data)
     return this._data;
   }
 
@@ -61,13 +69,6 @@ export class Dataset {
 
   getOutputPath(platform: Platform, annotation?: string) : string {
     return FileUtil.getOutputPath(this.path, platform, annotation);
-  }
-
-  getRandomSample() : FingerprintDatapoint {
-    let data = this.getAppData();
-    let samples = data.dataset;
-    let index = Math.floor(Math.random()*samples.length);
-    return samples[index];
   }
 
   plotSummary(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT, doPlot= true) {
@@ -199,17 +200,7 @@ export class Dataset {
   }
 }
 
-function getDistance(a : FingerprintDatapoint, b: FingerprintDatapoint) {
-  let squaredDistance = 0;
-  let similarItems = 0;
-  for (let deviceId in a.devices) {
-    if (b.devices[deviceId]) {
-      similarItems++;
-      squaredDistance += Math.pow(a.devices[deviceId] - b.devices[deviceId], 2);
-    }
-  }
-  return [squaredDistance, similarItems];
-}
+
 
 
 export function compareByDistance(set1 : FingerprintDatapoint[], set2: FingerprintDatapoint[], useSimilarItems = false) : [Plot, number] {

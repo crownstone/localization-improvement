@@ -1,7 +1,7 @@
 import {OutputData} from "./OutputData";
 import {OutputDataAggregatorContainer} from "./outputComponents/OutputDataAggregatorContainer";
 import {Util} from "../util/Util";
-import {Layout, stack} from "nodeplotlib";
+import {Layout, plot, stack} from "nodeplotlib";
 import {PLOT_DEFAULT_HEIGHT, PLOT_DEFAULT_WIDTH, PLOT_MARGINS} from "../config";
 
 export class OutputDataAggregator {
@@ -41,6 +41,13 @@ export class OutputDataAggregator {
     return hasDatapoints;
   }
 
+  getTotalSuccessRate(sphereId: string) {
+    return {
+      naiveBayesian: Math.round(100*this.naiveBayesian.getTotalSuccessRate(sphereId)),
+      knn:           Math.round(100*this.kNN.getTotalSuccessRate(sphereId)),
+    }
+  }
+  
   printTotalSuccessRate(sphereId: string) {
     try {
       console.log(`NaiveBayesian ${Math.round(100*this.naiveBayesian.getTotalSuccessRate(sphereId))}`)
@@ -51,7 +58,6 @@ export class OutputDataAggregator {
     }
     return true;
   }
-
 
   plotTotalSuccessRate(sphereId: string) : boolean {
     try {
@@ -96,6 +102,19 @@ export class OutputDataAggregator {
       return false;
     }
     return true;
+  }
+
+  plotSummary(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT) {
+    let sphereIds = Object.keys(this.locationNameMap);
+    for (let sphereId of sphereIds) {
+      this.plotTotalSuccessRate(sphereId);
+      this.plotSuccessRate(sphereId);
+      let hasDatapoints = this.plotConfusionMatrix(sphereId);
+      if (hasDatapoints) {
+        this.printTotalSuccessRate(sphereId);
+        plot();
+      }
+    }
   }
 }
 

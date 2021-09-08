@@ -88,7 +88,7 @@ function getSuccessPercentage() : number {
 }
 
 /**
- * the rows ( first index ) are the expected values, the columns are the actual measured values.
+ * the rows ( second index ) are the expected values, the columns (first index) are the actual measured values (classified as).
  */
 export function getConfusionMatrix() : {legend: string[], data: number[][] } {
   let output = fs.readFileSync(outputFilePath,'utf-8');

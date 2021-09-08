@@ -31,7 +31,7 @@ let processingMap = {
 
 
 let collective = new Collective()
-collective.loadMap(processingMap);
+collective.loadTestSetMap(processingMap);
 let datasets = collective.testSets[0].datasets;
 
 // only look at 1 sphere

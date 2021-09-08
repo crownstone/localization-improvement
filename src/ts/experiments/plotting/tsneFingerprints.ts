@@ -21,7 +21,7 @@ let processingMap = {
 
 
 let collective = new Collective()
-collective.loadMap(processingMap);
+collective.loadTestSetMap(processingMap);
 let fingerprint = collective.testSets[0].fingerprint;
 fingerprint.getAppData()
 

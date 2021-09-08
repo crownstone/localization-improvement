@@ -27,16 +27,26 @@ export const FileUtil = {
     return TMP_OUTPUT_PATH_BASE + `output_${platform}_${annotation}_${basename}`
   },
 
-  getDatasets: function() : Dataset[] {
+  getDatasets: function(user?: string, filenames? : string | string[]) : Dataset[] {
+    if (typeof filenames === 'string') {
+      filenames = [filenames];
+    }
+
     let users = FileUtil.getUsers();
     let datasets : Dataset[] = [];
     for (let userName in users) {
-      let user = users[userName];
-      for (let scenarioName in user.scenarios) {
-        let scenario = user.scenarios[scenarioName]
+      let currentUser = users[userName];
+      if (user && user !== userName) {
+        continue
+      }
+      for (let scenarioName in currentUser.scenarios) {
+        let scenario = currentUser.scenarios[scenarioName]
         let datasetFilePaths = FileUtil.getJSONFilePaths(scenario.path);
         for (let filePath of datasetFilePaths) {
-          datasets.push(new Dataset(filePath))
+          let dataset = new Dataset(filePath);
+          if (!filenames || filenames.indexOf(dataset.name) !== -1) {
+            datasets.push(new Dataset(filePath))
+          }
         }
       }
     }

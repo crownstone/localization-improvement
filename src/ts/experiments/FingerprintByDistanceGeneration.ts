@@ -2,7 +2,10 @@ import {FileUtil} from "../util/FileUtil";
 import {FingerprintGenerator} from "../dataContainers/FingerprintGenerator";
 import {TestSet} from "../dataContainers/TestSet";
 import {AddTitle} from "../util/PlotUtil";
+import {SIMULATION_CONFIG} from "../config";
 
+
+let successRates = [];
 async function runBatch(size) {
   let useDatasets = [
     "Localization_Dataset_Badkamer_9_2021-08-24 18_06_09.json",
@@ -20,26 +23,57 @@ async function runBatch(size) {
     "Localization_Dataset_Workshop_16_2021-08-24 16_57_01.json",
   ]
 
-  // let datasets = FileUtil.getDatasets(useDatasets);
-  //
-  // let gen = new FingerprintGenerator();
-  //
-  // gen.loadDatasets(datasets);
-  // gen.generateFingerprintBasedOnDistance(size)
-  //
-  // let testSet = new TestSet()
-  // testSet.loadDatasets(datasets);
-  // testSet.loadFingerprint(gen.getFingerprint())
-  //
-  // await testSet.runAll(true)
-  // AddTitle(`Fingerprint by distance size = ${size}`)
-  // testSet.aggregatedResult.plotSummary()
+  let datasets = FileUtil.getDatasets('Alex_de_Mulder', useDatasets);
+
+  let gen = new FingerprintGenerator();
+
+  gen.loadDatasets(datasets);
+  gen.generateFingerprintBasedOnDistance(size)
+
+  let testSet = new TestSet()
+  testSet.loadDatasets(datasets);
+  testSet.loadFingerprint(gen.getFingerprint())
+
+  await testSet.runAll(false)
+  AddTitle(`Fingerprint by distance size = ${size}`)
+  testSet.aggregatedResult.plotSummary()
+  successRates.push(testSet.aggregatedResult.getTotalSuccessRate('58de6bda62a2241400f10c67'))
 }
 
 async function run() {
-  let sizes = [20,40,60,8,100,120,140,200];
+  let sizes = [20,40,60,80,100,120,140,200];
   for (let size of sizes) {
     await runBatch(size)
   }
+  console.log(successRates)
 }
-run()
+
+
+runBatch(80)
+
+
+// Results:
+// // 20
+// NaiveBayesian 80
+// kNN           75
+// // 40
+// NaiveBayesian 88
+// kNN           81
+// // 60
+// NaiveBayesian 89
+// kNN           82
+// // 80
+// NaiveBayesian 90
+// kNN           82
+// // 100
+// NaiveBayesian 91
+// kNN           83
+// // 120
+// NaiveBayesian 91
+// kNN           86
+// // 140
+// NaiveBayesian 91
+// kNN           85
+// // 200
+// NaiveBayesian 93
+// kNN           86

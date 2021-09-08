@@ -3,6 +3,7 @@ import {TestSet} from "./TestSet";
 import {OutputDataAggregator} from "./OutputDataAggregator";
 import {plot} from "nodeplotlib";
 import {UserData} from "./UserData";
+import {Dataset} from "./Dataset";
 
 interface ProcessingMap {
   [userName: string] : boolean | {
@@ -16,6 +17,7 @@ interface ProcessingMap {
 
 export class Collective {
 
+  datasets: Dataset[] = [];
   testSets: TestSet[] = [];
 
   aggregatedResult : OutputDataAggregator;
@@ -27,7 +29,7 @@ export class Collective {
   /**
    * This generates a map that you can use as input for the loadMap method. It allows you to easily run an experiment on a subset of the available data.
    */
-  printProcessingMap() {
+  printTestSetMap() {
     let result : ProcessingMap = {};
     let users = FileUtil.getUsers();
 
@@ -37,10 +39,10 @@ export class Collective {
       for (let scenarioName in user.scenarios) {
         let scenario = user.scenarios[scenarioName];
         result[userName][scenarioName] = {};
-        for (let fingerprintName in scenario.sets) {
+        for (let fingerprintName in scenario.testSets) {
           result[userName][scenarioName][fingerprintName] = {};
 
-          let testSet = scenario.sets[fingerprintName];
+          let testSet = scenario.testSets[fingerprintName];
           for (let dataset of testSet.datasets) {
             result[userName][scenarioName][fingerprintName][dataset.name] = true;
           }
@@ -56,7 +58,7 @@ export class Collective {
    * Tell the collective to only load testfiles based on the users/fingerprints/datasets you want to use in this experiment.
    * @param map
    */
-  loadMap(map: ProcessingMap) {
+  loadTestSetMap(map: ProcessingMap) {
     let users = FileUtil.getUsers();
     for (let userName in map) {
       let userMapEntry = map[userName];
@@ -72,7 +74,7 @@ export class Collective {
       for (let scenarioName in userMapEntry) {
         let scenarioMapEntry = userMapEntry[scenarioName];
         if (scenarioMapEntry === true) {
-          for (let set of Object.values(user.scenarios[scenarioName]?.sets || {})) {
+          for (let set of Object.values(user.scenarios[scenarioName]?.testSets || {})) {
             this.testSets.push(set);
           }
           continue;
@@ -85,8 +87,8 @@ export class Collective {
         for (let fingerprintName in scenarioMapEntry) {
           let fingerprintMapEntry = scenarioMapEntry[fingerprintName];
           if (fingerprintMapEntry === true) {
-            if (scenario?.sets[fingerprintName]) {
-              this.testSets.push(scenario.sets[fingerprintName]);
+            if (scenario?.testSets[fingerprintName]) {
+              this.testSets.push(scenario.testSets[fingerprintName]);
             }
             continue;
           }
@@ -94,7 +96,7 @@ export class Collective {
             continue;
           }
 
-          let testSet = scenario?.sets[fingerprintName];
+          let testSet = scenario?.testSets[fingerprintName];
           if (!testSet) {
             continue;
           }
@@ -141,7 +143,7 @@ export class Collective {
     for (let scenarioName in user.scenarios) {
       let scenario = user.scenarios[scenarioName];
 
-      for (let set of Object.values(scenario.sets)) {
+      for (let set of Object.values(scenario.testSets)) {
         this.testSets.push(set);
       }
     }

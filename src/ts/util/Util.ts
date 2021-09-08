@@ -97,6 +97,9 @@ export const Util = {
 
 
   deepCopy(object) {
+    if (Array.isArray(object) === true) {
+      return Util.deepExtend({}, {data: object}).data;
+    }
     return Util.deepExtend({}, object);
   },
 
@@ -167,6 +170,18 @@ export const Util = {
     }
   }
 
+}
+
+export function getDistance(a : FingerprintDatapoint, b: FingerprintDatapoint) {
+  let squaredDistance = 0;
+  let similarItems = 0;
+  for (let deviceId in a.devices) {
+    if (b.devices[deviceId]) {
+      similarItems++;
+      squaredDistance += Math.pow(a.devices[deviceId] - b.devices[deviceId], 2);
+    }
+  }
+  return [squaredDistance, similarItems];
 }
 
 const S4 = function () {

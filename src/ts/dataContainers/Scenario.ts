@@ -1,6 +1,7 @@
 import path from "path";
 import {FileUtil} from "../util/FileUtil";
 import {TestSet} from "./TestSet";
+import {Dataset} from "./Dataset";
 
 export class Scenario {
 
@@ -8,7 +9,8 @@ export class Scenario {
 
   name         : string;
   path         : string;
-  sets         : {[fingerprintName: string]: TestSet} = {};
+  testSets     : {[fingerprintName: string]: TestSet} = {};
+  datasets     : Dataset[] = []
 
   constructor(scenarioPath: string, userName: string = "UNKNOWN") {
     this.userName = userName;
@@ -19,13 +21,20 @@ export class Scenario {
 
     for (let fingerprintPath of fingerprintFiles) {
       let set = new TestSet(scenarioPath, fingerprintPath, this.name, this.userName);
-      this.sets[set.fingerprint.name] = set;
+      this.testSets[set.fingerprint.name] = set;
+    }
+
+    let datasetFiles = FileUtil.getJSONFilePaths(scenarioPath);
+
+    for (let datasetPath of datasetFiles) {
+      let dataset = new Dataset(datasetPath);
+      this.datasets.push(dataset);
     }
   }
 
-  getSet(fingerprintName: string) : TestSet {
-    if (this.sets[fingerprintName]) {
-      return this.sets[fingerprintName];
+  getTestSet(fingerprintName: string) : TestSet {
+    if (this.testSets[fingerprintName]) {
+      return this.testSets[fingerprintName];
     }
 
     throw new Error("Fingerprint not found.");

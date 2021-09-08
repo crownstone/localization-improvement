@@ -26,20 +26,25 @@ let processingMap = {
 
 
 async function run() {
-  SIMULATION_CONFIG.interpolation.datasets = true;
-  SIMULATION_CONFIG.interpolation.fingerprint = true;
-  SIMULATION_CONFIG.interpolation.require2points = false;
+  SIMULATION_CONFIG.conversion.rssiToDistance = true;
+  SIMULATION_CONFIG.conversion.minDistanceMeters = 0.75; // about -50
+  SIMULATION_CONFIG.conversion.maxDistanceMeters = 7.5;  // about -90
 
-  for (let i = 0; i < 5; i++) {
-    SIMULATION_CONFIG.interpolation.timespanSeconds = i;
+  let collective = new Collective()
+  collective.loadTestSetMap(processingMap);
+  await collective.runSets();
 
-    let collective = new Collective()
-    collective.loadTestSetMap(processingMap);
-    await collective.runSets();
+  AddTitle(`Converting to distance`)
+  collective.plotSummary()
 
-    AddTitle(`Interpolation T = ${i}`)
-    collective.plotSummary()
-  }
+  SIMULATION_CONFIG.conversion.rssiToDistance = false;
+
+  collective = new Collective()
+  collective.loadTestSetMap(processingMap);
+  await collective.runSets();
+
+  AddTitle(`Not converting to distance`)
+  collective.plotSummary()
 };
 
 run()

@@ -1,10 +1,10 @@
 // Fingerprint
-interface Fingerprint {
+interface libFingerprint {
   sphereId:   string,
   locationId: LocationId,
   data:       FingerprintDatapoint[]
 }
-type FingerprintLibFileFormat = Fingerprint[]
+type FingerprintLibFileFormat = libFingerprint[]
 
 
 // Dataset

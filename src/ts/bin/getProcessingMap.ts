@@ -4,5 +4,5 @@ import {Collective} from "../dataContainers/Collective";
 
 
 let collective = new Collective()
-collective.printProcessingMap()
+collective.printTestSetMap()
 

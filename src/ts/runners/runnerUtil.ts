@@ -1,6 +1,6 @@
 import {exec} from "child_process";
 
-export async function run(command, silent= false) {
+export async function run(command, silent = false) {
   return new Promise<void>((resolve, reject) => {
     const callback = function (error, stdout, stderr) {
       if (error) {
@@ -8,8 +8,10 @@ export async function run(command, silent= false) {
         console.log('Error code: '+error.code);
         console.log('Signal received: '+error.signal);
       }
-      console.log('Child Process STDERR: ' + stderr);
-      console.log('Child Process STDOUT: ' + stdout);
+      if (silent === false) {
+        console.log('Child Process STDERR: ' + stderr);
+        console.log('Child Process STDOUT: ' + stdout);
+      }
       resolve();
     };
 

@@ -27,17 +27,22 @@ export class OutputDataContainer {
         this.classifications[item.sphereId] = {};
       }
 
-      if (this.classifications[item.sphereId][item.expectedLabel] === undefined) {
-        this.classifications[item.sphereId][item.expectedLabel] = {}
+
+      let expected = getLabel(item.expectedLabel);
+      let result = getLabel(item.result);
+
+
+      if (this.classifications[item.sphereId][expected] === undefined) {
+        this.classifications[item.sphereId][expected] = {}
       }
 
-      if (this.classifications[item.sphereId][item.expectedLabel][item.result] === undefined) {
-        this.classifications[item.sphereId][item.expectedLabel][item.result] = 0;
+      if (this.classifications[item.sphereId][expected][result] === undefined) {
+        this.classifications[item.sphereId][expected][result] = 0;
       }
 
-      this.classifications[item.sphereId][item.expectedLabel][item.result] += 1;
+      this.classifications[item.sphereId][expected][result] += 1;
 
-      if (item.result === item.expectedLabel) {
+      if (result === expected) {
         this.hit++;
       }
       else {
@@ -73,7 +78,7 @@ export class OutputDataContainer {
     let y = [];
 
     for (let result of this._data) {
-      y.push(this._label(result.sphereId, result.result));
+      y.push(this._label(result.sphereId, getLabel(result.result)));
     }
     const trace: Plot = {y: y, name:this.type, line:{color:getColor(this.type)}};
     return trace;
@@ -83,7 +88,7 @@ export class OutputDataContainer {
     let y = [];
 
     for (let result of this._data) {
-      y.push(this._label(result.sphereId, result.expectedLabel));
+      y.push(this._label(result.sphereId, getLabel(result.expectedLabel)));
     }
     const trace: Plot = {y: y, name: "Expected", line:{color:"#b1eb76"}};
     return trace;
@@ -92,6 +97,19 @@ export class OutputDataContainer {
   _label(sphereId, locationId) {
     return `${locationId}:${this.locationNameMap[sphereId][locationId]}`
   }
+}
+
+
+/**
+ * This is to be ready for split fingerprints.
+ * The label of a split fingerprint can be 5.1 5.2 5.3 etc, which all belong to room 5
+ * @param str
+ */
+function getLabel(str) {
+  if (str) {
+    return str.split(".")[0]
+  }
+  return str;
 }
 
 export function getColor(type) {

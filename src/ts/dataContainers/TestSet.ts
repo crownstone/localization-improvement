@@ -1,4 +1,4 @@
-import {Fingerprint, FingerprintBase} from "./Fingerprint";
+import {Fingerprint} from "./Fingerprint";
 import {Dataset} from "./Dataset";
 import {Runner} from "../runners/Runner";
 import {FileUtil} from "../util/FileUtil";
@@ -171,7 +171,8 @@ export class TestSet {
         let newArff = DataMapper.DatasetToWeka(dataset, this.fingerprint, crownstoneMap, locationNames);
         if (arff === null) {
           arff = newArff
-        } else {
+        }
+        else {
           arff.join(newArff);
         }
       }

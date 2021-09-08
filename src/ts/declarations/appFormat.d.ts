@@ -1,16 +1,17 @@
 interface SphereData {
   name: string,
-  iBeaconUUID: string,
-  uid: number,
+  iBeaconUUID?: string,
+  uid?: number,
   cloudId: string,
-  aiName: string,
-  latitude: number,
-  longitude: number,
-  updatedAt: string | Timestamp
+  aiName?: string,
+  latitude?: number,
+  longitude?: number,
+  updatedAt?: string | Timestamp
 }
 
 // Fingerprint
 interface FingerprintDatapoint {
+  id?: string,
   devices: DevicesData,
   timestamp: Timestamp
 }
@@ -21,7 +22,7 @@ interface AppFingerprintFormat {
       fingerprints: {
         [locationId: LocationId]: {
           name: string,       // location name
-          cloudId: string,    // location cloudId
+          cloudId?: string,    // location cloudId
           fingerprint: FingerprintDatapoint[]
         }
       }

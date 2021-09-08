@@ -3,7 +3,7 @@ import {Layout, plot, stack} from 'nodeplotlib';
 import {OutputDataContainer} from "./outputComponents/OutputDataContainer";
 import {Dataset} from "./Dataset";
 import {PLOT_DEFAULT_HEIGHT, PLOT_DEFAULT_WIDTH, PLOT_MARGINS} from "../config";
-import {FingerprintBase} from "./Fingerprint";
+import {Fingerprint} from "./Fingerprint";
 
 export class OutputData {
 
@@ -12,12 +12,12 @@ export class OutputData {
   _data : LibOutputDataset;
 
   dataset: Dataset
-  fingerprint: FingerprintBase
+  fingerprint: Fingerprint
 
   naiveBayesian : OutputDataContainer
   kNN           : OutputDataContainer
 
-  constructor(path: string, dataset: Dataset, fingerprint: FingerprintBase, locationNameMap: LocationNameMap) {
+  constructor(path: string, dataset: Dataset, fingerprint: Fingerprint, locationNameMap: LocationNameMap) {
     this.path = path;
     this.locationNameMap = locationNameMap;
     this.dataset = dataset;
