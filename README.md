@@ -176,3 +176,10 @@ git clone https://github.com/automl/autoweka
 ```
 
 If you don't clone it into this repo, you have to update the config to point to the autoweka jar file.
+
+# T-SNE
+
+There have been experiments with T-SNE and the code works and makes plots.
+We have found that this is not useable for classification so has not been further integrated.
+
+Code and examples are in the experiments/plotting folder.
