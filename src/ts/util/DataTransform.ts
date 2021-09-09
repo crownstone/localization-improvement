@@ -3,10 +3,20 @@ import {Util} from "./Util";
 
 export const DataTransform = {
 
-  applyRssiThreshold: function(dataContainer: FingerprintDatapoint[], threshold) {
+  applyRssiUpperThreshold: function(dataContainer: FingerprintDatapoint[], threshold) {
     for (let datapoint of dataContainer) {
       for (let deviceId in datapoint.devices) {
         if (datapoint.devices[deviceId] < threshold) {
+          delete datapoint.devices[deviceId];
+        }
+      }
+    }
+  },
+
+  applyRssiLowerThreshold: function(dataContainer: FingerprintDatapoint[], threshold) {
+    for (let datapoint of dataContainer) {
+      for (let deviceId in datapoint.devices) {
+        if (datapoint.devices[deviceId] > threshold) {
           delete datapoint.devices[deviceId];
         }
       }

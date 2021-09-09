@@ -198,6 +198,66 @@ export class Dataset {
 
     stack([plotData], layout);
   }
+
+  plotRssiBarGraph(width = PLOT_DEFAULT_WIDTH, height = PLOT_DEFAULT_HEIGHT*2, title = undefined, limit: number = -100) {
+    let data = this.getAppData();
+
+    let labelsY = [];
+
+    let deviceIds = {};
+    for (let i = 0; i < data.dataset.length; i++) {
+      let item = data.dataset[i];
+      labelsY.push(i)
+      for (let deviceId in item.devices) {
+        deviceIds[deviceId] = {};
+      }
+    }
+
+    let deviceIdArray = Object.keys(deviceIds);
+
+    for (let i = 0; i < data.dataset.length; i++) {
+      for (let j = 0; j < deviceIdArray.length; j++) {
+        let value = data.dataset[i].devices[deviceIdArray[j]];
+        if (value <= limit) { value = -100 }
+        if (!value) { continue; }
+        if (deviceIds[deviceIdArray[j]][value] === undefined) {
+          deviceIds[deviceIdArray[j]][value] = 0
+        }
+        deviceIds[deviceIdArray[j]][value] += 1
+      }
+    }
+
+
+    let plots : Plot[] = [];
+    for (let deviceId in deviceIds) {
+      let x = []
+      let y = []
+      for (let rssi in deviceIds[deviceId]) {
+        x.push(rssi);
+        y.push(deviceIds[deviceId][rssi])
+      }
+      let plotData : Plot = {
+        x,y,
+        name: deviceId,
+        type:"bar"
+
+      };
+      plots.push(plotData);
+    }
+
+
+
+    let layout : Layout = {
+      title: title || `Rssi distribution bar graph`,
+      width: width,
+      height: height,
+      xaxis:{title:"Crownstones"},
+      yaxis:{title:"samples"},
+      margin: {l: 150, r: 200, t: 100, b: 150},
+    }
+
+    stack(plots, layout);
+  }
 }
 
 
@@ -259,11 +319,13 @@ function applySimulationConfig(dataset: AppDatasetFormat) {
 }
 
 function applyRssiThreshold(dataset: AppDatasetFormat) {
-  if (SIMULATION_CONFIG.datasets.rssiUpperThreshold === -100) {
-    return;
+  if (SIMULATION_CONFIG.datasets.rssiUpperThreshold !== -100) {
+    DataTransform.applyRssiUpperThreshold(dataset.dataset, SIMULATION_CONFIG.datasets.rssiUpperThreshold);
   }
 
-  DataTransform.applyRssiThreshold(dataset.dataset, SIMULATION_CONFIG.datasets.rssiUpperThreshold);
+  if (SIMULATION_CONFIG.datasets.rssiLowerThreshold !== 0) {
+    DataTransform.applyRssiLowerThreshold(dataset.dataset, SIMULATION_CONFIG.datasets.rssiLowerThreshold);
+  }
 }
 
 

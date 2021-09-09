@@ -35,7 +35,7 @@ struct LocalizationSet: ParsableCommand {
         
         let naiveBayesianClassifier = CrownstoneBasicClassifier()
         let knnClassifier = Forest()
-        knnClassifier.setDebugging(debug: true)
+//        knnClassifier.setDebugging(debug: true)
 
         for fingerprint in fingerprintJSON {
             let json = fingerprint.1
@@ -63,8 +63,8 @@ struct LocalizationSet: ParsableCommand {
                 inputVector.append(iBeaconPacket(idString: point[0].stringValue, rssi: point[1].numberValue))
             }
             
-            let NaiveBayesianResult = naiveBayesianClassifier.classifyRaw(inputVector, referenceId: sphereId)
-            let kNNResult = knnClassifier.classify(inputVector, referenceId: sphereId)
+            let NaiveBayesianResult = naiveBayesianClassifier.classify(inputVector, referenceId: sphereId)
+//            let kNNResult = knnClassifier.classify(inputVector, referenceId: sphereId)
             NaiveBayesianResults.append([
                             "sphereId":      sphereId,
                             "result":        NaiveBayesianResult as Any,
@@ -72,12 +72,12 @@ struct LocalizationSet: ParsableCommand {
 //                            "probabilities": naiveBayesianClassifier.getProbabilities(sphereId) as Any
                         ])
             
-            kNNResults.append([
-                            "sphereId":      sphereId,
-                            "result":        kNNResult as Any,
-                            "expectedLabel": data["label"].stringValue,
-//                            "distanceMap":   knnClassifier.getDistanceMap(sphereId) as Any
-                        ])
+//            kNNResults.append([
+//                            "sphereId":      sphereId,
+//                            "result":        kNNResult as Any,
+//                            "expectedLabel": data["label"].stringValue,
+////                            "distanceMap":   knnClassifier.getDistanceMap(sphereId) as Any
+//                        ])
             
             
         }

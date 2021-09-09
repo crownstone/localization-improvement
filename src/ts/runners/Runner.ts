@@ -32,7 +32,7 @@ export class Runner {
       if (!alreadyExists || overwrite === true) {
         dataset.writeToTempFile();
         let start = Date.now();
-        if (!silent) { console.log("Running iOS classifier with", this.fingerprintRef.name, "and", dataset.name, `(${dataset._data.dataset.length} points)`); }
+        console.log("Running iOS classifier with", this.fingerprintRef.name, "and", dataset.name, `(${dataset._data.dataset.length} points)`);
         await runIOS(outputPath, silent);
         if (!silent) { console.log("Completed. Took", (0.001*(Date.now() - start)).toFixed(3),'seconds.'); }
       }

@@ -20,16 +20,16 @@ import {plot} from "nodeplotlib";
 // }
 
 async function plotDatasets() {
-  SIMULATION_CONFIG.interpolation.datasets = true;
-  SIMULATION_CONFIG.interpolation.fingerprint = false;
-  SIMULATION_CONFIG.interpolation.require2points = false;
-  SIMULATION_CONFIG.interpolation.timespanSeconds = 10;
-  let sets = FileUtil.getDatasets();
+  // SIMULATION_CONFIG.interpolation.datasets = true;
+  // SIMULATION_CONFIG.interpolation.fingerprint = false;
+  // SIMULATION_CONFIG.interpolation.require2points = false;
+  // SIMULATION_CONFIG.interpolation.timespanSeconds = 5;
+  let sets = FileUtil.getDatasets("Alex_de_Mulder");
   let i = 0
   for (let set of sets) {
     i++;
     if (i == 21) {
-      set.plotRssiOverview()
+      set.plotRssiBarGraph()
       plot()
     }
   }

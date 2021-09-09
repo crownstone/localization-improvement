@@ -159,15 +159,17 @@ function applySimulationConfig(fingerprints: AppFingerprintFormat) {
 }
 
 function applyRssiThreshold(fingerprints: AppFingerprintFormat) {
-  if (SIMULATION_CONFIG.fingerprints.rssiUpperThreshold === -100) {
-    return;
-  }
-
   for (let sphereId in fingerprints.spheres) {
     let sphere = fingerprints.spheres[sphereId];
     for (let locationId in sphere.fingerprints) {
       let data = sphere.fingerprints[locationId].fingerprint;
-      DataTransform.applyRssiThreshold(data, SIMULATION_CONFIG.fingerprints.rssiUpperThreshold);
+      if (SIMULATION_CONFIG.fingerprints.rssiUpperThreshold !== -100) {
+        DataTransform.applyRssiUpperThreshold(data, SIMULATION_CONFIG.fingerprints.rssiUpperThreshold);
+      }
+
+      if (SIMULATION_CONFIG.fingerprints.rssiLowerThreshold !== 0) {
+        DataTransform.applyRssiLowerThreshold(data, SIMULATION_CONFIG.fingerprints.rssiLowerThreshold);
+      }
     }
   }
 }

@@ -73,7 +73,7 @@ async function genWekaFiles() {
 
   let gen = new FingerprintGenerator();
   gen.loadDatasets(datasets);
-  gen.generateFingerprintRandomly(150);
+  gen.generateFingerprintRandomly(300);
 
   let fingerprint = gen.getFingerprint();
 
@@ -93,9 +93,8 @@ async function run() {
   }
 }
 
-// run()
+runBatch(300)
 
-genWekaFiles()
 
 // RESULT
 // 20  NB 82.2 KNN 90.9

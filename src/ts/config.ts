@@ -18,9 +18,11 @@ export const PLOT_DEFAULT_HEIGHT = 400;
 export const SIMULATION_CONFIG = {
   fingerprints: {
     rssiUpperThreshold: -100,
+    rssiLowerThreshold: 0,
   },
   datasets: {
     rssiUpperThreshold: -100,
+    rssiLowerThreshold: 0,
   },
   conversion: {
     rssiToDistance: false,
