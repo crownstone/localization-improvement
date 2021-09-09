@@ -209,7 +209,7 @@ export class Dataset {
       let item = data.dataset[i];
       labelsY.push(i)
       for (let deviceId in item.devices) {
-        deviceIds[deviceId] = {};
+        deviceIds[deviceId] = []
       }
     }
 
@@ -220,27 +220,17 @@ export class Dataset {
         let value = data.dataset[i].devices[deviceIdArray[j]];
         if (value <= limit) { value = -100 }
         if (!value) { continue; }
-        if (deviceIds[deviceIdArray[j]][value] === undefined) {
-          deviceIds[deviceIdArray[j]][value] = 0
-        }
-        deviceIds[deviceIdArray[j]][value] += 1
+        deviceIds[deviceIdArray[j]].push(value)
       }
     }
 
 
     let plots : Plot[] = [];
     for (let deviceId in deviceIds) {
-      let x = []
-      let y = []
-      for (let rssi in deviceIds[deviceId]) {
-        x.push(rssi);
-        y.push(deviceIds[deviceId][rssi])
-      }
       let plotData : Plot = {
-        x,y,
+        x: deviceIds[deviceId],
         name: deviceId,
-        type:"bar"
-
+        type:"histogram"
       };
       plots.push(plotData);
     }
@@ -248,7 +238,7 @@ export class Dataset {
 
 
     let layout : Layout = {
-      title: title || `Rssi distribution bar graph`,
+      title: title || `Rssi distribution Histogram`,
       width: width,
       height: height,
       xaxis:{title:"Crownstones"},
@@ -258,6 +248,7 @@ export class Dataset {
 
     stack(plots, layout);
   }
+
 }
 
 

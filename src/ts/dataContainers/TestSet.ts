@@ -7,6 +7,8 @@ import {OutputDataAggregator} from "./OutputDataAggregator";
 import {SIMULATION_CONFIG, WEKA_DATASET_PATH, WEKA_FINGERPRINT_PATH} from "../config";
 import {Util} from "../util/Util";
 import {DataMapper} from "../util/DataMappers";
+import {NaiveBayesian} from "../runners/node/NaiveBayesian";
+import {NaiveBayesianGaussianMixture} from "../runners/node/NaiveBayesianGaussianMixture";
 var sha1 = require('sha1');
 
 
@@ -119,6 +121,33 @@ export class TestSet {
       this.results[this.datasets[i].name] = new OutputData(outputPaths[i], this.datasets[i], this.fingerprint, this._getLocationNameMap());
     }
 
+    this.clearAggregatedResults()
+    this.aggregate();
+
+    return Object.values(this.results);
+  }
+
+  async runAllNode() : Promise<OutputData[]> {
+    this._ensureAggregator()
+
+    let classifier = new NaiveBayesian();
+    classifier.train(this.fingerprint.getAppData());
+
+    for (let dataset of this.datasets) {
+      let data = dataset.getAppData();
+      let outputData : LibOutputDataset = {naiveBayesian: [], kNN: []}
+      for (let datapoint of data.dataset) {
+        let classification = classifier.classify(datapoint, dataset.sphereId);
+        outputData.naiveBayesian.push({
+          sphereId:       dataset.sphereId,
+          result:         classification,
+          expectedLabel:  dataset.locationId,
+          probabilities:  {}
+        });
+      }
+      this.results[dataset.name] = new OutputData(null, dataset, this.fingerprint, this._getLocationNameMap());
+      this.results[dataset.name].setData(outputData);
+    }
     this.clearAggregatedResults()
     this.aggregate();
 

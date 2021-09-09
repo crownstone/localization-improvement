@@ -17,23 +17,20 @@ export class OutputData {
   naiveBayesian : OutputDataContainer
   kNN           : OutputDataContainer
 
-  constructor(path: string, dataset: Dataset, fingerprint: Fingerprint, locationNameMap: LocationNameMap) {
+  constructor(path: string | null, dataset: Dataset, fingerprint: Fingerprint, locationNameMap: LocationNameMap) {
     this.path = path;
     this.locationNameMap = locationNameMap;
     this.dataset = dataset;
     this.fingerprint = fingerprint;
-    this.process()
-  }
 
-  loadData() {
-    this._data = FileUtil.readJSON<LibOutputDataset>(this.path);
-  }
-
-  process() {
-    if (this._data === undefined) {
-      this.loadData();
+    if (this.path) {
+      let data = FileUtil.readJSON<LibOutputDataset>(this.path);
+      this.setData(data);
     }
+  }
 
+  setData(data) {
+    this._data = data;
     this.naiveBayesian = new OutputDataContainer(this._data.naiveBayesian, this.locationNameMap, 'naiveBayesian')
     this.kNN           = new OutputDataContainer(this._data.kNN,           this.locationNameMap, 'kNN')
   }

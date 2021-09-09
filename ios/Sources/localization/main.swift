@@ -33,8 +33,8 @@ struct LocalizationSet: ParsableCommand {
         var NaiveBayesianResults = [[String: Any]]()
         var kNNResults = [[String: Any]]()
         
-        let naiveBayesianClassifier = CrownstoneBasicClassifier()
-        let knnClassifier = Forest()
+        let naiveBayesianClassifier = CrownstoneBasicClassifier(useSmoothing: false)
+        let knnClassifier = Forest(useSmoothing: false)
 //        knnClassifier.setDebugging(debug: true)
 
         for fingerprint in fingerprintJSON {
