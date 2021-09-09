@@ -1,18 +1,13 @@
-import {AddTitle} from "../../util/PlotUtil";
-import {plot} from "nodeplotlib";
-
 
 export class NaiveBayesian {
 
-  MINIMUM_STD = 3
+  MINIMUM_STD = 1;
 
   fingerprints = {};
   sampleSize = {};
   probability = {};
 
   MINIMUM_REQUIRED_SAMPLES = 3;
-  PROBABILITY_MINIMUM = 1e-9;
-  MINIMUM_RSSI = -60;
 
   constructor() {}
 
@@ -50,7 +45,7 @@ export class NaiveBayesian {
       for (let locationId in fingerprintSet[sphereId]) {
         let locationData = fingerprintSet[sphereId][locationId];
         for (let crownstoneId in locationData) {
-          this.fingerprints[sphereId][locationId][crownstoneId] = fitGaussian(locationData[crownstoneId])
+          this.fingerprints[sphereId][locationId][crownstoneId] = fitGaussian(locationData[crownstoneId], this.MINIMUM_STD)
         }
       }
     }
@@ -127,13 +122,13 @@ function getStd(measurements, mean) {
   return Math.sqrt(variance);
 }
 
-export function fitGaussian(RSSIs: Number[]) {
+export function fitGaussian(RSSIs: number[], minStd: number) {
   let mean = getMean(RSSIs)
   let std = getStd(RSSIs, mean)
 
   // do not allow small standard deviations
-  if (std < 3) {
-    std = 3;
+  if (std < minStd) {
+    std = minStd;
   }
   return {mean: mean, std: std};
 }

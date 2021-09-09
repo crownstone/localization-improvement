@@ -6,7 +6,7 @@ import {AddTitle} from "../../util/PlotUtil";
 
 
 export class NaiveBayesianGaussianMixture {
-
+  MINIMUM_STD = 1;
   fingerprints = {};
   sampleSize = {};
   probability = {};
@@ -50,7 +50,7 @@ export class NaiveBayesianGaussianMixture {
         let locationData = fingerprintSet[sphereId][locationId];
         AddTitle(fingerprints.spheres[sphereId].sphere.name + "  " + fingerprints.spheres[sphereId].fingerprints[locationId].name)
         for (let crownstoneId in locationData) {
-          this.fingerprints[sphereId][locationId][crownstoneId] = fitMultipleGaussians(locationData[crownstoneId], crownstoneId);
+          this.fingerprints[sphereId][locationId][crownstoneId] = fitMultipleGaussians(locationData[crownstoneId], crownstoneId, this.MINIMUM_STD);
         }
         plot()
       }
@@ -131,7 +131,7 @@ function getStd(measurements, mean) {
 }
 
 
-function fitMultipleGaussians(RSSIs: Number[], crownstoneId: string) {
+function fitMultipleGaussians(RSSIs: number[], crownstoneId: string, minStd) {
 
   let count : any = {}
   for (let value of RSSIs) {
@@ -160,7 +160,7 @@ function fitMultipleGaussians(RSSIs: Number[], crownstoneId: string) {
   for (let yval of y) {
     sum += yval;
   }
-  let gaussian = fitGaussian(RSSIs);
+  let gaussian = fitGaussian(RSSIs, minStd);
 
   let xx = Util.deepCopy(x)
   xx.sort();
