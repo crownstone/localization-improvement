@@ -12,6 +12,7 @@ import {NaiveBayesianGaussianMixture} from "../runners/node/NaiveBayesianGaussia
 var sha1 = require('sha1');
 
 
+
 export class TestSet {
 
   userName      : string;
@@ -127,31 +128,37 @@ export class TestSet {
     return Object.values(this.results);
   }
 
-  async runAllNode() : Promise<OutputData[]> {
+
+  async runCustomClassifier(classifier : ClassifierInterface) {
     this._ensureAggregator()
 
-    let classifier = new NaiveBayesian();
     classifier.train(this.fingerprint.getAppData());
 
     for (let dataset of this.datasets) {
       let data = dataset.getAppData();
-      let outputData : LibOutputDataset = {naiveBayesian: [], kNN: []}
+      let result = [];
       for (let datapoint of data.dataset) {
         let classification = classifier.classify(datapoint, dataset.sphereId);
-        outputData.naiveBayesian.push({
+        result.push({
           sphereId:       dataset.sphereId,
           result:         classification,
           expectedLabel:  dataset.locationId,
-          probabilities:  {}
         });
       }
       this.results[dataset.name] = new OutputData(null, dataset, this.fingerprint, this._getLocationNameMap());
-      this.results[dataset.name].setData(outputData);
+      this.results[dataset.name].setData(result, classifier.name);
     }
+
     this.clearAggregatedResults()
     this.aggregate();
 
     return Object.values(this.results);
+  }
+
+
+
+  async runAllNode() : Promise<OutputData[]> {
+    return this.runCustomClassifier(new NaiveBayesian())
   }
 
 

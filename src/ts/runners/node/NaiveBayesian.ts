@@ -1,5 +1,5 @@
-
-export class NaiveBayesian {
+export class NaiveBayesian implements ClassifierInterface {
+  name = 'nodeNaiveBayesian';
 
   MINIMUM_STD = 1;
 

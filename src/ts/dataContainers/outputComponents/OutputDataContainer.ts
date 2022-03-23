@@ -27,10 +27,8 @@ export class OutputDataContainer {
         this.classifications[item.sphereId] = {};
       }
 
-
       let expected = getLabel(item.expectedLabel);
       let result = getLabel(item.result);
-
 
       if (this.classifications[item.sphereId][expected] === undefined) {
         this.classifications[item.sphereId][expected] = {}
@@ -50,6 +48,7 @@ export class OutputDataContainer {
       }
       this.count++;
     }
+
     this.rate = this.hit / this.count;
     this.percentage = (100*this.rate).toFixed(3) + "%";
   }
@@ -118,5 +117,7 @@ export function getColor(type) {
       return "#2c9aa8"
     case "kNN":
       return "#ff9b08"
+    default:
+      return "#2c9aa8"
   }
 }

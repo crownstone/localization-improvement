@@ -26,6 +26,7 @@ export class Collective {
     this.aggregatedResult = new OutputDataAggregator({});
   }
 
+
   /**
    * This generates a map that you can use as input for the loadMap method. It allows you to easily run an experiment on a subset of the available data.
    */
@@ -171,6 +172,13 @@ export class Collective {
   async runSets(overwrite = false) {
     for (let set of this.testSets) {
       await set.runAll(overwrite);
+      this.aggregatedResult.merge(set.aggregatedResult);
+    }
+  }
+
+  async runSetsCustomClassifier(classifier: ClassifierInterface) {
+    for (let set of this.testSets) {
+      await set.runCustomClassifier(classifier);
       this.aggregatedResult.merge(set.aggregatedResult);
     }
   }

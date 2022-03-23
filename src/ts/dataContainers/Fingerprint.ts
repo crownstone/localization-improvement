@@ -156,6 +156,24 @@ function applySimulationConfig(fingerprints: AppFingerprintFormat) {
   applyRssiThreshold(fingerprints);
   applyDistanceConversion(fingerprints);
   applyInterpolation(fingerprints);
+
+  // applyPostProcessing(fingerprints)
+}
+
+function applyPostProcessing(fingerprints: AppFingerprintFormat) {
+  // // only use even values
+  // for (let sphereId in fingerprints.spheres) {
+  //   let sphere = fingerprints.spheres[sphereId];
+  //   for (let locationId in sphere.fingerprints) {
+  //     let data = sphere.fingerprints[locationId].fingerprint;
+  //     for (let datapoint of data) {
+  //       for (let deviceId in datapoint.devices) {
+  //         let rssi = datapoint.devices[deviceId];
+  //         datapoint.devices[deviceId] = rssi - rssi % 2;
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 function applyRssiThreshold(fingerprints: AppFingerprintFormat) {

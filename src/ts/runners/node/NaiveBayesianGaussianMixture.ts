@@ -1,11 +1,12 @@
 import {fitGaussian} from "./NaiveBayesian";
-import {gunzip} from "zlib";
 import {plot, stack} from "nodeplotlib";
 import {Util} from "../../util/Util";
 import {AddTitle} from "../../util/PlotUtil";
 
 
-export class NaiveBayesianGaussianMixture {
+export class NaiveBayesianGaussianMixture implements ClassifierInterface {
+  name = 'nodeNaiveBayesianGaussianMixture';
+
   MINIMUM_STD = 1;
   fingerprints = {};
   sampleSize = {};
@@ -48,11 +49,11 @@ export class NaiveBayesianGaussianMixture {
     for (let sphereId in fingerprintSet) {
       for (let locationId in fingerprintSet[sphereId]) {
         let locationData = fingerprintSet[sphereId][locationId];
-        AddTitle(fingerprints.spheres[sphereId].sphere.name + "  " + fingerprints.spheres[sphereId].fingerprints[locationId].name)
+        // AddTitle(fingerprints.spheres[sphereId].sphere.name + "  " + fingerprints.spheres[sphereId].fingerprints[locationId].name)
         for (let crownstoneId in locationData) {
           this.fingerprints[sphereId][locationId][crownstoneId] = fitMultipleGaussians(locationData[crownstoneId], crownstoneId, this.MINIMUM_STD);
         }
-        plot()
+        // plot()
       }
     }
   }
@@ -132,7 +133,6 @@ function getStd(measurements, mean) {
 
 
 function fitMultipleGaussians(RSSIs: number[], crownstoneId: string, minStd) {
-
   let count : any = {}
   for (let value of RSSIs) {
     let val = String(value)
@@ -180,5 +180,54 @@ function fitMultipleGaussians(RSSIs: number[], crownstoneId: string, minStd) {
   }
 
   stack([{x,y, type:'bar',}, {x:xxx,y:yyy}],{title: crownstoneId, height: 500})
+}
 
+function plotFitMultipleGaussians(RSSIs: number[], crownstoneId: string, minStd) {
+  let count : any = {}
+  for (let value of RSSIs) {
+    let val = String(value)
+    if (count[val] === undefined) {
+      count[val] = 0
+    }
+    count[val] += 1;
+  }
+
+  let x = []
+  let y = [];
+  for (let item in count) {
+    x.push(Number(item))
+    y.push(count[item])
+  }
+
+  let sum = 0
+  for (let yval of y) {
+    sum += yval;
+  }
+
+  y = y.map(val => val / sum)
+
+  sum = 0
+  for (let yval of y) {
+    sum += yval;
+  }
+  let gaussian = fitGaussian(RSSIs, minStd);
+
+  let xx = Util.deepCopy(x)
+  xx.sort();
+
+  let max = xx[0];
+  let min = xx[xx.length-1];
+  let xxx = [];
+  let yyy = [];
+  let steps = 100;
+  for (let i = 0; i < steps; i++) {
+    xxx.push((i / steps) * (max - min) + min)
+  }
+  for (let val of xxx) {
+    let exponent = Math.exp(-(Math.pow(val - gaussian.mean,2)/(2*Math.pow(gaussian.std,2))));
+    let stoneProbability = exponent / (Math.sqrt(2*Math.PI) * gaussian.std);
+    yyy.push(stoneProbability)
+  }
+
+  stack([{x,y, type:'bar',}, {x:xxx,y:yyy}],{title: crownstoneId, height: 500})
 }

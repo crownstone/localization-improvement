@@ -307,6 +307,18 @@ function applySimulationConfig(dataset: AppDatasetFormat) {
   applyInterpolation(dataset);
   applyRssiThreshold(dataset);
   applyDistanceConversion(dataset);
+
+  // applyPostProcessing(dataset)
+}
+
+function applyPostProcessing(dataset: AppDatasetFormat) {
+  // // only use even values
+  // for (let datapoint of dataset.dataset) {
+  //   for (let deviceId in datapoint.devices) {
+  //     let rssi = datapoint.devices[deviceId];
+  //     datapoint.devices[deviceId] = rssi - rssi % 2;
+  //   }
+  // }
 }
 
 function applyRssiThreshold(dataset: AppDatasetFormat) {

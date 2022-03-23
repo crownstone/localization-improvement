@@ -61,7 +61,7 @@ export class OutputDataAggregatorContainer {
     let locationDataObjects = Object.values(allKeys)
     locationDataObjects.sort((a,b) => {
       return Number(a.id) > Number(b.id) ? 1 : -1
-    })
+    });
 
     let hasDatapoints = false;
     let zValues = [];
@@ -76,7 +76,7 @@ export class OutputDataAggregatorContainer {
           zArr.push(0)
         }
       }
-      zValues.push(zArr)
+      zValues.push(zArr);
     }
 
     if (!hasDatapoints) { return false; }
@@ -140,6 +140,7 @@ export class OutputDataAggregatorContainer {
     }
 
     stack(data, layout);
+
     return hasDatapoints;
   }
 

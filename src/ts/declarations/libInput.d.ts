@@ -16,3 +16,9 @@ interface DatapointFile {
 }
 type DatasetFileLibFormat = DatapointFile[]
 
+interface ClassifierInterface {
+  name: string,
+  train:    (fingerprint: AppFingerprintFormat) => void,
+  classify: (inputVector : FingerprintDatapoint, sphereId: string) => LocationId
+  clear:    () => void
+}
