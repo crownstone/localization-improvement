@@ -11,6 +11,7 @@
   },
   "author": "Alex",
   "dependencies": {
+    "@agtabesh/lsh": "^0.1.0",
     "nodeplotlib": "^0.7.5",
     "peerjs-on-node": "^1.0.2",
     "plotter": "^0.5.0",
